@@ -11,7 +11,7 @@ import {
 } from './demoData.js';
 
 const STORAGE_KEY_PREFIX = 'campusgear_demo_';
-const DEMO_VERSION = 'v3_campusgear';
+const DEMO_VERSION = 'v4_editorial';
 
 const INITIAL_REPORTS = [
   {
@@ -642,7 +642,7 @@ export class DemoStore {
       author: payload.p_author,
       category: cat?.name || (itemType === 'lab_gear' ? 'Lab Gear' : 'Textbook'),
       colorHex: itemType === 'lab_gear' ? '#0F766E' : '#1E3A8A',
-      accentHex: '#F4C95D',
+      accentHex: '#B42318',
       itemType: itemType,
     });
 

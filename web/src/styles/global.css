@@ -24,6 +24,24 @@ body {
   -moz-osx-font-smoothing: grayscale;
 }
 
+h1, h2, h3, .heading-serif {
+  font-family: var(--font-serif);
+  color: var(--color-text);
+  font-weight: 700;
+  letter-spacing: -0.015em;
+}
+
+.section-eyebrow {
+  display: inline-block;
+  font-family: var(--font-sans);
+  font-size: var(--font-size-xs);
+  font-weight: var(--font-weight-bold);
+  text-transform: uppercase;
+  letter-spacing: 0.12em;
+  color: var(--color-accent);
+  margin-bottom: var(--space-2);
+}
+
 a {
   color: inherit;
   text-decoration: none;

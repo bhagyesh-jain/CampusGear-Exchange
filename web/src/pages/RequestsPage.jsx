@@ -552,8 +552,9 @@ export function RequestsPage() {
                       <div className="request-book-meta">
                         <span style={{
                           fontWeight: '700',
-                          color: isGear ? '#B45309' : '#1E3A8A',
-                          backgroundColor: isGear ? '#FEF3C7' : '#EAF2FF',
+                          color: isGear ? '#FFFFFF' : '#111111',
+                          backgroundColor: isGear ? '#111111' : '#FAF7F2',
+                          border: isGear ? '1px solid #111111' : '1px solid #E8E2D9',
                           padding: '1px 6px',
                           borderRadius: '4px',
                           fontSize: '0.7rem'
@@ -711,7 +712,6 @@ export function RequestsPage() {
                               variant="primary"
                               size="sm"
                               onClick={() => handleOpenScheduleModal(req)}
-                              style={{ backgroundColor: '#243B64', borderColor: '#1E3A8A' }}
                             >
                               📅 Schedule Campus Pickup
                             </Button>

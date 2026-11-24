@@ -364,8 +364,9 @@ export function BookDetailPage() {
               borderRadius: '4px',
               fontSize: 'var(--font-size-xs)',
               fontWeight: 'var(--font-weight-bold)',
-              backgroundColor: listing.item_type === 'lab_gear' ? '#F4C95D' : '#243B64',
-              color: listing.item_type === 'lab_gear' ? '#1E293B' : '#FFFFFF',
+              backgroundColor: listing.item_type === 'lab_gear' ? '#111111' : '#FAF7F2',
+              color: listing.item_type === 'lab_gear' ? '#FFFFFF' : '#111111',
+              border: listing.item_type === 'lab_gear' ? '1px solid #111111' : '1px solid #E8E2D9',
             }}>
               {listing.item_type === 'lab_gear' ? '⚙️ Lab Gear' : '📖 Textbook'}
             </span>
@@ -429,7 +430,7 @@ export function BookDetailPage() {
 
               <div>
                 <span style={{ fontSize: 'var(--font-size-xs)', color: 'var(--color-muted)', display: 'block' }}>Campus Pickup Point</span>
-                <span style={{ fontWeight: 'var(--font-weight-semibold)', fontSize: 'var(--font-size-sm)', color: '#243B64' }}>
+                <span style={{ fontWeight: 'var(--font-weight-semibold)', fontSize: 'var(--font-size-sm)', color: 'var(--color-text)' }}>
                   📍 {listing.pickup_point || 'AITR Central Library'}
                 </span>
               </div>

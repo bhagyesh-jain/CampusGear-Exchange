@@ -317,13 +317,13 @@ export function SellPage({ isEdit = false }) {
       <div style={{ marginBottom: 'var(--space-4)' }}>
         <Link
           to={isEdit ? `/book/${editId}` : '/'}
-          style={{ color: 'var(--color-navy)', fontSize: 'var(--font-size-sm)' }}
+          style={{ color: 'var(--color-text)', fontSize: 'var(--font-size-sm)' }}
         >
           ← {isEdit ? 'Back to listing' : 'Back to Home'}
         </Link>
       </div>
 
-      <h1 style={{ fontSize: 'var(--font-size-2xl)', color: 'var(--color-navy)', marginBottom: 'var(--space-2)' }}>
+      <h1 style={{ fontSize: 'var(--font-size-2xl)', color: 'var(--color-text)', marginBottom: 'var(--space-2)' }}>
         {isEdit ? 'Edit Listing' : 'List Textbook or Lab Gear for Exchange'}
       </h1>
       <p style={{ color: 'var(--color-muted)', fontSize: 'var(--font-size-sm)', marginBottom: 'var(--space-6)' }}>
@@ -562,7 +562,7 @@ export function SellPage({ isEdit = false }) {
                         style={{
                           width: `${item.progress}%`,
                           height: '100%',
-                          background: 'var(--color-navy)',
+                          background: 'var(--color-primary)',
                           transition: 'width 0.2s',
                         }}
                       />

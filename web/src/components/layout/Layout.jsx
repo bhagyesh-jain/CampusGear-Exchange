@@ -27,17 +27,17 @@ export function Layout() {
               xmlns="http://www.w3.org/2000/svg"
               aria-hidden="true"
             >
-              <rect width="32" height="32" rx="8" fill="var(--color-navy)" />
+              <rect width="32" height="32" rx="8" fill="#111111" />
               <path
                 d="M8 10C8 8.89543 8.89543 8 10 8H15V24H10C8.89543 24 8 23.1046 8 22V10Z"
-                fill="#FFFFFF"
-                opacity="0.9"
+                fill="#FAF7F2"
+                opacity="0.95"
               />
               <path
                 d="M17 8H22C23.1046 8 24 8.89543 24 10V22C24 23.1046 23.1046 24 22 24H17V8Z"
-                fill="var(--color-yellow)"
+                fill="#B42318"
               />
-              <circle cx="16" cy="16" r="3" fill="var(--color-navy)" />
+              <circle cx="16" cy="16" r="3" fill="#111111" />
             </svg>
             <span className="brand-text">
               <span className="brand-primary">Campus</span>
@@ -101,17 +101,17 @@ export function Layout() {
               xmlns="http://www.w3.org/2000/svg"
               aria-hidden="true"
             >
-              <rect width="32" height="32" rx="8" fill="var(--color-navy)" />
+              <rect width="32" height="32" rx="8" fill="#111111" />
               <path
                 d="M8 10C8 8.89543 8.89543 8 10 8H15V24H10C8.89543 24 8 23.1046 8 22V10Z"
-                fill="#FFFFFF"
-                opacity="0.9"
+                fill="#FAF7F2"
+                opacity="0.95"
               />
               <path
                 d="M17 8H22C23.1046 8 24 8.89543 24 10V22C24 23.1046 23.1046 24 22 24H17V8Z"
-                fill="var(--color-yellow)"
+                fill="#B42318"
               />
-              <circle cx="16" cy="16" r="3" fill="var(--color-navy)" />
+              <circle cx="16" cy="16" r="3" fill="#111111" />
             </svg>
             <span className="brand-text">
               <span className="brand-primary">Campus</span>
@@ -143,7 +143,7 @@ export function Layout() {
             <span className="footer-sep" aria-hidden="true">•</span>
             <Link to="/contact" className="footer-link">Contact Administrator</Link>
           </div>
-          <p className="footer-credits" style={{ fontSize: 'var(--font-size-sm)', color: 'var(--color-navy)', fontWeight: 'var(--font-weight-medium)', marginBottom: 'var(--space-1)' }}>
+          <p className="footer-credits" style={{ fontSize: 'var(--font-size-sm)', color: 'var(--color-text)', fontWeight: 'var(--font-weight-medium)', marginBottom: 'var(--space-1)' }}>
             Developed by <strong>Bhagyesh Jain</strong>, Acropolis Institute of Technology and Research (AITR), Indore.
           </p>
           <p className="footer-copy">

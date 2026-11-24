@@ -176,9 +176,9 @@
 }
 
 .status-pill.pickup_scheduled {
-  background-color: #EAF2FF;
-  color: #1E3A8A;
-  border: 1px solid #BFDBFE;
+  background-color: var(--color-bg);
+  color: var(--color-text);
+  border: 1px solid var(--color-border);
 }
 
 .status-pill.handed_over {
@@ -302,9 +302,9 @@
 }
 
 .pickup-time-chip:hover {
-  background-color: #EAF2FF;
-  border-color: #93C5FD;
-  color: #1E3A8A;
+  background-color: var(--color-bg);
+  border-color: var(--color-primary);
+  color: var(--color-text);
 }
 
 @media (max-width: 600px) {

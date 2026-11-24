@@ -83,8 +83,8 @@ export function generateCoverSvg({ title, author, category, colorHex, accentHex,
   <line x1="28" y1="0" x2="28" y2="520" stroke="rgba(255,255,255,0.15)" stroke-width="2" />
 
   <!-- Category Tag -->
-  <rect x="44" y="36" width="160" height="26" rx="4" fill="${accentHex || '#F4C95D'}" fill-opacity="0.25" stroke="${accentHex || '#F4C95D'}" stroke-width="1.5" />
-  <text x="52" y="53" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif" font-size="11" font-weight="700" fill="${accentHex || '#F4C95D'}" letter-spacing="1.2">${cleanCategory}</text>
+  <rect x="44" y="36" width="160" height="26" rx="4" fill="${accentHex || '#B42318'}" fill-opacity="0.25" stroke="${accentHex || '#B42318'}" stroke-width="1.5" />
+  <text x="52" y="53" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif" font-size="11" font-weight="700" fill="${accentHex || '#B42318'}" letter-spacing="1.2">${cleanCategory}</text>
 
   <!-- Title Lines -->
   <text x="44" y="115" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif" font-size="24" font-weight="800" fill="#FFFFFF">${line1}</text>
@@ -92,7 +92,7 @@ export function generateCoverSvg({ title, author, category, colorHex, accentHex,
   ${line3 ? `<text x="44" y="181" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif" font-size="20" font-weight="700" fill="#E5E7EB">${line3}</text>` : ''}
 
   <!-- Decorative Separator Line -->
-  <line x1="44" y1="210" x2="120" y2="210" stroke="${accentHex || '#F4C95D'}" stroke-width="4" stroke-linecap="round" />
+  <line x1="44" y1="210" x2="120" y2="210" stroke="${accentHex || '#B42318'}" stroke-width="4" stroke-linecap="round" />
 
   <!-- Author/Brand -->
   <text x="44" y="245" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif" font-size="14" font-weight="500" fill="#D1D5DB">${isLabGear ? 'Lab Gear: ' : 'by '}${cleanAuthor}</text>
@@ -102,7 +102,7 @@ export function generateCoverSvg({ title, author, category, colorHex, accentHex,
   <!-- Badge at bottom -->
   <rect x="44" y="452" width="312" height="36" rx="6" fill="rgba(0,0,0,0.3)" stroke="rgba(255,255,255,0.1)" stroke-width="1" />
   <text x="56" y="475" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif" font-size="12" font-weight="600" fill="#9CA3AF">${badgeText}</text>
-  <circle cx="334" cy="470" r="6" fill="${accentHex || '#F4C95D'}" />
+  <circle cx="334" cy="470" r="6" fill="${accentHex || '#B42318'}" />
 </svg>
   `.trim();
 
@@ -204,7 +204,7 @@ export const INITIAL_DEMO_BOOKS = [
     description: 'Complete engineering mini-drafter with steel clamp, scale, protractor head, and drafting sheet clips. Required for CSIT 1st semester drawing lab.',
     created_at: new Date(Date.now() - 3600000 * 1).toISOString(),
     cover_color: '#0F766E',
-    accent_color: '#F4C95D',
+    accent_color: '#B42318',
   },
   {
     id: 'gear-2',
@@ -246,7 +246,7 @@ export const INITIAL_DEMO_BOOKS = [
     description: 'Original Casio fx-991 non-programmable scientific calculator with 417 functions, matrix/vector operations, natural textbook display. Fully working.',
     created_at: new Date(Date.now() - 3600000 * 6).toISOString(),
     cover_color: '#312E81',
-    accent_color: '#F4C95D',
+    accent_color: '#B42318',
   },
   {
     id: 'gear-4',
@@ -353,7 +353,7 @@ export const INITIAL_DEMO_BOOKS = [
     description: 'The standard bible for algorithms. Pristine condition with zero pencil notes or yellowing. Perfect for semester exams & placements.',
     created_at: new Date(Date.now() - 3600000 * 15).toISOString(),
     cover_color: '#1E3A8A',
-    accent_color: '#F4C95D',
+    accent_color: '#B42318',
   },
   {
     id: 'book-3',

@@ -245,10 +245,10 @@ export function LoginPage({ initialTab }) {
       <div className="auth-left">
         <Link to="/" className="auth-left-top" aria-label="Return to CampusGear Home">
           <svg width="34" height="34" viewBox="0 0 32 32" fill="none" xmlns="http://www.w3.org/2000/svg">
-            <rect width="32" height="32" rx="8" fill="#1B2C4B" />
-            <path d="M8 10C8 8.89543 8.89543 8 10 8H15V24H10C8.89543 24 8 23.1046 8 22V10Z" fill="#FFFFFF" opacity="0.9" />
-            <path d="M17 8H22C23.1046 8 24 8.89543 24 10V22C24 23.1046 23.1046 24 22 24H17V8Z" fill="#F4C95D" />
-            <circle cx="16" cy="16" r="3" fill="#1B2C4B" />
+            <rect width="32" height="32" rx="8" fill="#111111" />
+            <path d="M8 10C8 8.89543 8.89543 8 10 8H15V24H10C8.89543 24 8 23.1046 8 22V10Z" fill="#FAF7F2" opacity="0.95" />
+            <path d="M17 8H22C23.1046 8 24 8.89543 24 10V22C24 23.1046 23.1046 24 22 24H17V8Z" fill="#B42318" />
+            <circle cx="16" cy="16" r="3" fill="#111111" />
           </svg>
           <div className="auth-brand-text">
             Campus<span>Gear</span>
@@ -284,9 +284,9 @@ export function LoginPage({ initialTab }) {
           <div className="auth-top-nav">
             <Link to="/" className="auth-mobile-brand">
               <svg width="28" height="28" viewBox="0 0 32 32" fill="none">
-                <rect width="32" height="32" rx="8" fill="#243B64" />
-                <path d="M8 10C8 8.89543 8.89543 8 10 8H15V24H10C8.89543 24 8 23.1046 8 22V10Z" fill="#FFFFFF" />
-                <path d="M17 8H22C23.1046 8 24 8.89543 24 10V22C24 23.1046 23.1046 24 22 24H17V8Z" fill="#F4C95D" />
+                <rect width="32" height="32" rx="8" fill="#111111" />
+                <path d="M8 10C8 8.89543 8.89543 8 10 8H15V24H10C8.89543 24 8 23.1046 8 22V10Z" fill="#FAF7F2" />
+                <path d="M17 8H22C23.1046 8 24 8.89543 24 10V22C24 23.1046 23.1046 24 22 24H17V8Z" fill="#B42318" />
               </svg>
               <span>CampusGear</span>
             </Link>
