@@ -113,7 +113,7 @@ export function HomePage() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
 
-  // Generate SVG preview covers for right-side hero visual
+  // Featured preview covers for right-side hero visual
   const featuredStack = [
     {
       title: 'Engineering Drafter Set',
@@ -121,14 +121,7 @@ export function HomePage() {
       type: 'lab_gear',
       branch: 'CSIT Sem 1',
       price: '₹450',
-      cover: generateCoverSvg({
-        title: 'Engineering Drafter Set',
-        author: 'Omega Standard',
-        category: 'Lab Gear',
-        colorHex: '#0F766E',
-        accentHex: '#B42318',
-        itemType: 'lab_gear',
-      }),
+      cover: '/covers/drafter-set.png',
     },
     {
       title: 'Operating System Concepts',
@@ -136,14 +129,7 @@ export function HomePage() {
       type: 'book',
       branch: 'CSIT Sem 3',
       price: '₹420',
-      cover: generateCoverSvg({
-        title: 'Operating System Concepts',
-        author: 'Silberschatz',
-        category: 'Computer Science',
-        colorHex: '#1E293B',
-        accentHex: '#B42318',
-        itemType: 'book',
-      }),
+      cover: '/covers/os-concepts.png',
     },
     {
       title: 'Scientific Calculator fx-991',
@@ -151,14 +137,7 @@ export function HomePage() {
       type: 'lab_gear',
       branch: 'EC Sem 2',
       price: '₹650',
-      cover: generateCoverSvg({
-        title: 'Scientific Calculator fx-991',
-        author: 'Casio',
-        category: 'Lab Gear',
-        colorHex: '#262626',
-        accentHex: '#B42318',
-        itemType: 'lab_gear',
-      }),
+      cover: '/covers/calculator-fx991.png',
     },
   ];
 

@@ -241,7 +241,7 @@ export function LoginPage({ initialTab }) {
 
   return (
     <div className="auth-page">
-      {/* ── LEFT COLUMN: Editorial Branding & Decorative Showcase ── */}
+      {/* ── LEFT COLUMN: Editorial Branding with Single Background Image ── */}
       <div className="auth-left">
         <div className="auth-left-top-bar">
           <Link to="/" className="auth-left-top" aria-label="Return to CampusGear Home">
@@ -271,39 +271,7 @@ export function LoginPage({ initialTab }) {
             Textbooks and lab gear from seniors, handed over on campus.
           </p>
 
-          {/* Asymmetrical Offset Image Collage (Direct transparent images, no card wrappers) */}
-          <div className="auth-asymmetric-collage">
-            <div className="collage-col collage-col-left">
-              <div className="collage-cell collage-hero-cell">
-                <img
-                  className="collage-img collage-hero"
-                  src="/covers/drafter-set.png"
-                  alt="Textbooks and Engineering Drafter"
-                />
-              </div>
-              <div className="collage-cell collage-flatlay-cell">
-                <img
-                  className="collage-img collage-flatlay"
-                  src="/covers/calculator.png"
-                  alt="Scientific Calculator"
-                />
-              </div>
-            </div>
-
-            <div className="collage-col collage-col-right">
-              {/* Clean empty space where the non-transparent lab-coat.png was (requires re-exporting) */}
-              <div className="collage-cell collage-empty-cell" aria-hidden="true" />
-              <div className="collage-cell collage-campus-cell">
-                <img
-                  className="collage-img collage-campus"
-                  src="/covers/campus.png"
-                  alt="Campus Meetup Point"
-                />
-              </div>
-            </div>
-          </div>
-
-          {/* Stats row in one line */}
+          {/* Stats row at the bottom of content */}
           <div className="auth-stats-row">
             18 Listings &nbsp;·&nbsp; 6 Branches &nbsp;·&nbsp; 5 Pickup Points
           </div>

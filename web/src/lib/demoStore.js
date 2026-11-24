@@ -11,7 +11,7 @@ import {
 } from './demoData.js';
 
 const STORAGE_KEY_PREFIX = 'campusgear_demo_';
-const DEMO_VERSION = 'v4_editorial';
+const DEMO_VERSION = 'v6_chatgpt_covers';
 
 const INITIAL_REPORTS = [
   {
@@ -162,7 +162,7 @@ export function initDemoState() {
   let listings = getStored('listings', null);
   if (!listings || isOutdated) {
     listings = INITIAL_DEMO_BOOKS.map((b) => {
-      const coverUrl = generateCoverSvg({
+      const coverUrl = b.cover || b.cover_image || generateCoverSvg({
         title: b.title,
         author: b.author,
         category: categories.find((c) => c.id === b.category_id)?.name || (b.item_type === 'lab_gear' ? 'Lab Gear' : 'Engineering'),
@@ -596,7 +596,7 @@ export class DemoStore {
         created_at: b.created_at,
         institution_name: inst?.name || 'AITR, Indore',
         seller_display_name: seller?.display_name || 'Campus Student',
-        cover_path: b.images?.[0] || b.listing_images?.[0]?.storage_path || '',
+        cover_path: b.cover || b.cover_image || b.images?.[0] || b.listing_images?.[0]?.storage_path || '',
         total_count: totalCount,
       };
     });

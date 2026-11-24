@@ -47,6 +47,7 @@ export function SellPage({ isEdit = false }) {
   const [submitting, setSubmitting] = useState(false);
   const [statusText, setStatusText] = useState('');
   const [errorMsg, setErrorMsg] = useState('');
+  const [fieldErrors, setFieldErrors] = useState({});
   const [toastMsg, setToastMsg] = useState('');
 
   // Load categories
@@ -192,27 +193,60 @@ export function SellPage({ isEdit = false }) {
   const handleSubmit = async (e) => {
     e.preventDefault();
     setErrorMsg('');
+    setFieldErrors({});
 
-    // Validations
+    // Validations with per-field tracking
+    const errors = {};
     if (!title.trim()) {
-      setErrorMsg('Title is required.');
-      return;
-    }
-    if (!categoryId) {
-      setErrorMsg('Please select a category.');
-      return;
+      errors.title = 'Title is required.';
     }
     const rupeesNum = parseFloat(priceRupees);
     if (isNaN(rupeesNum) || rupeesNum < 0) {
-      setErrorMsg('Please enter a valid price (₹0 or greater).');
-      return;
+      errors.price = 'Please enter a valid price (₹0 or greater).';
+    }
+    if (!categoryId) {
+      errors.category = 'Please select a category.';
+    }
+    if (!branch) {
+      errors.branch = 'Please select an engineering branch.';
+    }
+    if (!semester) {
+      errors.semester = 'Please select a semester.';
+    }
+    if (!pickupPoint) {
+      errors.pickupPoint = 'Please select a campus pickup point.';
     }
     if (description.length > 500) {
-      setErrorMsg('Description must be 500 characters or fewer.');
-      return;
+      errors.description = 'Description must be 500 characters or fewer.';
     }
     if (photos.length < 1 || photos.length > 3) {
-      setErrorMsg('Please provide between 1 and 3 photos for your book.');
+      errors.photos = 'Please provide between 1 and 3 photos for your book.';
+    }
+
+    if (Object.keys(errors).length > 0) {
+      setFieldErrors(errors);
+      const firstKey = Object.keys(errors)[0];
+      setErrorMsg(errors[firstKey]);
+
+      // Scroll smoothly to first error element and focus it
+      const elementIdMap = {
+        title: 'listing-title',
+        price: 'listing-price',
+        category: 'listing-category',
+        branch: 'listing-branch',
+        semester: 'listing-semester',
+        pickupPoint: 'listing-pickup-point',
+        description: 'listing-description',
+        photos: 'photos-section',
+      };
+      const targetId = elementIdMap[firstKey];
+      const targetEl = targetId ? document.getElementById(targetId) : null;
+      if (targetEl) {
+        targetEl.scrollIntoView({ behavior: 'smooth', block: 'center' });
+        if (typeof targetEl.focus === 'function') {
+          targetEl.focus();
+        }
+      }
       return;
     }
 
@@ -331,14 +365,6 @@ export function SellPage({ isEdit = false }) {
       </p>
 
       <Card>
-        {errorMsg && (
-          <ErrorState
-            title="Listing Error"
-            message={errorMsg}
-            className="mb-4"
-          />
-        )}
-
         <form onSubmit={handleSubmit} style={{ display: 'flex', flexDirection: 'column' }}>
           {/* Item Type Selector */}
           <Field
@@ -376,10 +402,15 @@ export function SellPage({ isEdit = false }) {
           </Field>
 
           <Field
+            id="listing-title"
             label={itemType === 'lab_gear' ? 'Item / Gear Title' : 'Book Title'}
             placeholder={itemType === 'lab_gear' ? 'e.g. Engineering Drafter Set' : 'e.g. Operating System Concepts'}
             value={title}
-            onChange={(e) => setTitle(e.target.value)}
+            onChange={(e) => {
+              setTitle(e.target.value);
+              if (fieldErrors.title) setFieldErrors((prev) => ({ ...prev, title: '' }));
+            }}
+            error={fieldErrors.title}
             required
           />
 
@@ -400,10 +431,15 @@ export function SellPage({ isEdit = false }) {
           </div>
 
           <Field
+            id="listing-category"
             label="Category"
             as="select"
             value={categoryId}
-            onChange={(e) => setCategoryId(e.target.value)}
+            onChange={(e) => {
+              setCategoryId(e.target.value);
+              if (fieldErrors.category) setFieldErrors((prev) => ({ ...prev, category: '' }));
+            }}
+            error={fieldErrors.category}
             required
           >
             <option value="">-- Select academic category --</option>
@@ -417,10 +453,15 @@ export function SellPage({ isEdit = false }) {
           {/* Branch and Semester Filter fields */}
           <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))', gap: 'var(--space-3)' }}>
             <Field
+              id="listing-branch"
               label="Engineering Branch"
               as="select"
               value={branch}
-              onChange={(e) => setBranch(e.target.value)}
+              onChange={(e) => {
+                setBranch(e.target.value);
+                if (fieldErrors.branch) setFieldErrors((prev) => ({ ...prev, branch: '' }));
+              }}
+              error={fieldErrors.branch}
               required
             >
               {BRANCH_OPTIONS.map((b) => (
@@ -431,10 +472,15 @@ export function SellPage({ isEdit = false }) {
             </Field>
 
             <Field
+              id="listing-semester"
               label="Semester"
               as="select"
               value={semester}
-              onChange={(e) => setSemester(e.target.value)}
+              onChange={(e) => {
+                setSemester(e.target.value);
+                if (fieldErrors.semester) setFieldErrors((prev) => ({ ...prev, semester: '' }));
+              }}
+              error={fieldErrors.semester}
               required
             >
               {SEMESTER_OPTIONS.map((s) => (
@@ -447,10 +493,15 @@ export function SellPage({ isEdit = false }) {
 
           {/* Campus Handover Pickup Point */}
           <Field
+            id="listing-pickup-point"
             label="Campus Pickup Point (Handover Zone)"
             as="select"
             value={pickupPoint}
-            onChange={(e) => setPickupPoint(e.target.value)}
+            onChange={(e) => {
+              setPickupPoint(e.target.value);
+              if (fieldErrors.pickupPoint) setFieldErrors((prev) => ({ ...prev, pickupPoint: '' }));
+            }}
+            error={fieldErrors.pickupPoint}
             required
             hint="Select the designated campus meet point for coordinate exchange."
           >
@@ -484,13 +535,18 @@ export function SellPage({ isEdit = false }) {
           </div>
 
           <Field
+            id="listing-price"
             label="Price (in Indian Rupees ₹)"
             type="number"
             min="0"
             step="1"
             placeholder="e.g. 450 (enter 0 if giving away for free)"
             value={priceRupees}
-            onChange={(e) => setPriceRupees(e.target.value)}
+            onChange={(e) => {
+              setPriceRupees(e.target.value);
+              if (fieldErrors.price) setFieldErrors((prev) => ({ ...prev, price: '' }));
+            }}
+            error={fieldErrors.price}
             required
             hint="Set an affordable campus price. Enter 0 if offering as a giveaway."
           />
@@ -498,12 +554,17 @@ export function SellPage({ isEdit = false }) {
           {/* Description with character counter */}
           <div style={{ position: 'relative' }}>
             <Field
+              id="listing-description"
               label="Description & Notes"
               as="textarea"
               maxLength={500}
               placeholder="Mention semester usefulness, highlighting notes, missing pages, or campus pickup preferences..."
               value={description}
-              onChange={(e) => setDescription(e.target.value)}
+              onChange={(e) => {
+                setDescription(e.target.value);
+                if (fieldErrors.description) setFieldErrors((prev) => ({ ...prev, description: '' }));
+              }}
+              error={fieldErrors.description}
               hint="Max 500 characters."
             />
             <span
@@ -520,7 +581,7 @@ export function SellPage({ isEdit = false }) {
           </div>
 
           {/* Photos Upload Section (1..3 photos) */}
-          <div style={{ marginBottom: 'var(--space-6)' }}>
+          <div id="photos-section" tabIndex="-1" style={{ marginBottom: 'var(--space-6)', outline: 'none' }}>
             <label style={{ display: 'block', fontSize: 'var(--font-size-sm)', fontWeight: 'var(--font-weight-semibold)', color: 'var(--color-navy)', marginBottom: 'var(--space-2)' }}>
               Book Photos * <span style={{ fontWeight: 'normal', color: 'var(--color-muted)' }}>(1 to 3 images, max 2MB each)</span>
             </label>
@@ -618,17 +679,18 @@ export function SellPage({ isEdit = false }) {
                     width: '100px',
                     height: '130px',
                     borderRadius: 'var(--radius-md)',
-                    border: '2px dashed var(--color-border)',
+                    border: fieldErrors.photos ? '2px dashed #B42318' : '2px dashed var(--color-border)',
                     display: 'flex',
                     flexDirection: 'column',
                     alignItems: 'center',
                     justifyContent: 'center',
                     cursor: 'pointer',
-                    color: 'var(--color-muted)',
+                    color: fieldErrors.photos ? '#B42318' : 'var(--color-muted)',
                     textAlign: 'center',
                     padding: 'var(--space-2)',
                     fontSize: 'var(--font-size-xs)',
-                    backgroundColor: 'var(--color-bg)',
+                    backgroundColor: fieldErrors.photos ? '#FEF2F2' : 'var(--color-bg)',
+                    transition: 'all 0.15s ease',
                   }}
                 >
                   <span style={{ fontSize: '1.5rem', marginBottom: '2px' }}>📷</span>
@@ -636,12 +698,22 @@ export function SellPage({ isEdit = false }) {
                   <input
                     type="file"
                     accept="image/jpeg,image/png,image/webp"
-                    onChange={handlePhotoSelect}
+                    onChange={(e) => {
+                      handlePhotoSelect(e);
+                      if (fieldErrors.photos) setFieldErrors((prev) => ({ ...prev, photos: '' }));
+                    }}
                     style={{ display: 'none' }}
                   />
                 </label>
               )}
             </div>
+
+            {/* Error directly under photos field */}
+            {fieldErrors.photos && (
+              <p style={{ color: '#B42318', fontSize: 'var(--font-size-xs)', fontWeight: '600', marginTop: '6px' }}>
+                {fieldErrors.photos}
+              </p>
+            )}
           </div>
 
           {/* Submission status text */}
@@ -649,6 +721,27 @@ export function SellPage({ isEdit = false }) {
             <p style={{ color: 'var(--color-navy)', fontSize: 'var(--font-size-sm)', marginBottom: 'var(--space-3)' }}>
               {statusText}
             </p>
+          )}
+
+          {/* Validation Error Summary directly above the Publish button */}
+          {errorMsg && (
+            <div
+              style={{
+                padding: '10px 14px',
+                backgroundColor: '#FEF2F2',
+                border: '1px solid #FCA5A5',
+                borderRadius: '8px',
+                color: '#B42318',
+                fontSize: '0.88rem',
+                fontWeight: 600,
+                marginBottom: '14px',
+                display: 'flex',
+                alignItems: 'center',
+                gap: '8px',
+              }}
+            >
+              <span>⚠️</span> {errorMsg}
+            </div>
           )}
 
           <Button type="submit" variant="primary" loading={submitting} fullWidth>

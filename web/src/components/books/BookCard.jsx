@@ -14,7 +14,7 @@ const CONDITION_LABELS = {
 export function BookCard({ book }) {
   if (!book) return null;
 
-  const photoUrl = book.cover_path ? getListingPhotoUrl(book.cover_path) : null;
+  const photoUrl = (book.cover_path || book.cover || book.cover_image) ? getListingPhotoUrl(book.cover_path || book.cover || book.cover_image) : null;
   const conditionLabel = CONDITION_LABELS[book.condition] || book.condition || 'Used';
   const isLabGear = book.item_type === 'lab_gear';
 

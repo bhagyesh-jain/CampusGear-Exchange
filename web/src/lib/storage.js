@@ -34,8 +34,8 @@ export function validateImageFile(file) {
  */
 export function getListingPhotoUrl(path) {
   if (!path) return '';
-  // If already a full URL
-  if (path.startsWith('http://') || path.startsWith('https://') || path.startsWith('data:')) return path;
+  // If already a full URL or root-relative path
+  if (path.startsWith('http://') || path.startsWith('https://') || path.startsWith('data:') || path.startsWith('/')) return path;
 
   const { data } = supabase.storage.from(BUCKET_NAME).getPublicUrl(path);
   return data?.publicUrl || '';

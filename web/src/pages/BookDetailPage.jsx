@@ -125,7 +125,9 @@ export function BookDetailPage() {
   const isAvailable = listing.status === 'active';
 
   const images = (listing.listing_images || []).sort((a, b) => a.display_order - b.display_order);
-  const activeImageUrl = images.length > 0 ? getListingPhotoUrl(images[selectedImageIdx]?.storage_path) : '';
+  const activeImageUrl = images.length > 0
+    ? getListingPhotoUrl(images[selectedImageIdx]?.storage_path)
+    : (listing.cover || listing.cover_image ? getListingPhotoUrl(listing.cover || listing.cover_image) : '');
 
   // Condition labels
   const conditionLabels = {
@@ -306,12 +308,14 @@ export function BookDetailPage() {
             <div style={{
               width: '100%',
               height: '380px',
-              backgroundColor: 'var(--color-bg)',
+              backgroundColor: '#FAF7F2',
               borderRadius: 'var(--radius-md)',
               overflow: 'hidden',
               display: 'flex',
               alignItems: 'center',
               justifyContent: 'center',
+              padding: '16px',
+              boxSizing: 'border-box',
             }}>
               {activeImageUrl ? (
                 <img
@@ -341,12 +345,13 @@ export function BookDetailPage() {
                     border: selectedImageIdx === idx ? '2px solid var(--color-navy)' : '1px solid var(--color-border)',
                     padding: 0,
                     cursor: 'pointer',
+                    backgroundColor: '#FAF7F2',
                   }}
                 >
                   <img
                     src={getListingPhotoUrl(img.storage_path)}
                     alt={`Thumbnail ${idx + 1}`}
-                    style={{ width: '100%', height: '100%', objectFit: 'cover' }}
+                    style={{ width: '100%', height: '100%', objectFit: 'contain' }}
                   />
                 </button>
               ))}

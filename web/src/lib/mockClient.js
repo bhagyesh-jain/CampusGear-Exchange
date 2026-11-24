@@ -189,6 +189,7 @@ class MockQueryBuilder {
 
       result = all.map((b) => ({
         ...b,
+        cover_path: b.cover || b.cover_image || b.images?.[0] || b.listing_images?.[0]?.storage_path || '',
         item_type: b.item_type || 'book',
         branch: b.branch || 'CSIT',
         semester: b.semester || 1,
@@ -197,7 +198,7 @@ class MockQueryBuilder {
         institution: institutions.find((i) => i.id === b.institution_id) || { name: 'AITR Indore', city: 'Indore' },
         category: categories.find((c) => c.id === b.category_id) || { name: b.item_type === 'lab_gear' ? 'Lab Gear' : 'Computer Science' },
         seller: users.find((u) => u.id === b.seller_id) || { id: b.seller_id, display_name: 'Campus Student' },
-        listing_images: b.listing_images || [{ id: 'img-1', storage_path: b.images?.[0], display_order: 1 }],
+        listing_images: b.listing_images || [{ id: 'img-1', storage_path: b.cover_image || b.images?.[0], display_order: 1 }],
       }));
     } else if (this.table === 'profiles') {
       const users = DemoStore.getUsers();
