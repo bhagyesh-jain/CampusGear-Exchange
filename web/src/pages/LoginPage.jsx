@@ -120,7 +120,7 @@ export function LoginPage({ initialTab }) {
   };
 
   // ── 1-Click Demo Login ──
-  const handleDemoSignIn = async (email, password) => {
+  const handleDemoSignIn = async (email, password, destination) => {
     setLoginEmail(email);
     setLoginPassword(password);
     setLoginSubmitting(true);
@@ -133,7 +133,7 @@ export function LoginPage({ initialTab }) {
         setLoginSubmitting(false);
         return;
       }
-      navigate(decodeURIComponent(nextUrl), { replace: true });
+      navigate(destination || decodeURIComponent(nextUrl), { replace: true });
     } catch (err) {
       setLoginError(err.message || 'Unexpected login error.');
       setLoginSubmitting(false);
@@ -241,38 +241,75 @@ export function LoginPage({ initialTab }) {
 
   return (
     <div className="auth-page">
-      {/* ── LEFT COLUMN: Navy Editorial Branding ── */}
+      {/* ── LEFT COLUMN: Editorial Branding & Decorative Showcase ── */}
       <div className="auth-left">
-        <Link to="/" className="auth-left-top" aria-label="Return to CampusGear Home">
-          <svg width="34" height="34" viewBox="0 0 32 32" fill="none" xmlns="http://www.w3.org/2000/svg">
-            <rect width="32" height="32" rx="8" fill="#111111" />
-            <path d="M8 10C8 8.89543 8.89543 8 10 8H15V24H10C8.89543 24 8 23.1046 8 22V10Z" fill="#FAF7F2" opacity="0.95" />
-            <path d="M17 8H22C23.1046 8 24 8.89543 24 10V22C24 23.1046 23.1046 24 22 24H17V8Z" fill="#B42318" />
-            <circle cx="16" cy="16" r="3" fill="#111111" />
-          </svg>
-          <div className="auth-brand-text">
-            Campus<span>Gear</span>
+        <div className="auth-left-top-bar">
+          <Link to="/" className="auth-left-top" aria-label="Return to CampusGear Home">
+            <svg width="32" height="32" viewBox="0 0 32 32" fill="none" xmlns="http://www.w3.org/2000/svg">
+              <rect width="32" height="32" rx="8" fill="#111111" />
+              <path d="M8 10C8 8.89543 8.89543 8 10 8H15V24H10C8.89543 24 8 23.1046 8 22V10Z" fill="#FAF7F2" opacity="0.95" />
+              <path d="M17 8H22C23.1046 8 24 8.89543 24 10V22C24 23.1046 23.1046 24 22 24H17V8Z" fill="#B42318" />
+              <circle cx="16" cy="16" r="3" fill="#111111" />
+            </svg>
+            <div className="auth-brand-text">
+              Campus<span>Gear</span>
+            </div>
+          </Link>
+          <div className="auth-campus-pill">
+            <span>🎓</span> Verified AITR Exchange &nbsp;·&nbsp; Central Library Handover
           </div>
-        </Link>
+        </div>
 
-        <div className="auth-left-center">
+        <div className="auth-left-content">
           <div className="auth-tagline">
             Your campus.<br />
             Their books.<br />
-            <span>Your price.</span>
+            <span className="auth-tagline-highlight">Your price.</span>
           </div>
 
           <p className="auth-desc">
-            Join your campus marketplace. Register with your campus email, verify your student identity instantly, and buy or sell textbooks with zero middleman markups.
+            Textbooks and lab gear from seniors, handed over on campus.
           </p>
 
-          <div className="auth-campus-pill">
-            <span>🎓</span> Verified for Acropolis Institute &amp; Top Indore Campuses
+          {/* Asymmetrical Offset Image Collage (Direct transparent images, no card wrappers) */}
+          <div className="auth-asymmetric-collage">
+            <div className="collage-col collage-col-left">
+              <div className="collage-cell collage-hero-cell">
+                <img
+                  className="collage-img collage-hero"
+                  src="/covers/drafter-set.png"
+                  alt="Textbooks and Engineering Drafter"
+                />
+              </div>
+              <div className="collage-cell collage-flatlay-cell">
+                <img
+                  className="collage-img collage-flatlay"
+                  src="/covers/calculator.png"
+                  alt="Scientific Calculator"
+                />
+              </div>
+            </div>
+
+            <div className="collage-col collage-col-right">
+              {/* Clean empty space where the non-transparent lab-coat.png was (requires re-exporting) */}
+              <div className="collage-cell collage-empty-cell" aria-hidden="true" />
+              <div className="collage-cell collage-campus-cell">
+                <img
+                  className="collage-img collage-campus"
+                  src="/covers/campus.png"
+                  alt="Campus Meetup Point"
+                />
+              </div>
+            </div>
+          </div>
+
+          {/* Stats row in one line */}
+          <div className="auth-stats-row">
+            18 Listings &nbsp;·&nbsp; 6 Branches &nbsp;·&nbsp; 5 Pickup Points
           </div>
         </div>
 
         <div className="auth-left-foot">
-          © {new Date().getFullYear()} CampusGear Exchange &nbsp;·&nbsp; Made for students<br />
           Developed by <strong>Bhagyesh Jain</strong>, Acropolis Institute of Technology and Research (AITR), Indore.
         </div>
       </div>
@@ -403,6 +440,17 @@ export function LoginPage({ initialTab }) {
                       <span>👤</span> Priya Nair
                     </span>
                     <span className="demo-user-role buyer">Buyer · IT 2nd Yr</span>
+                  </button>
+
+                  <button
+                    type="button"
+                    className="demo-user-btn demo-admin-btn"
+                    onClick={() => handleDemoSignIn('admin@campusgear.test', 'Demo@1234', '/admin')}
+                  >
+                    <span className="demo-user-name">
+                      <span>🛡️</span> CampusGear Admin
+                    </span>
+                    <span className="demo-user-role admin">Admin · AITR</span>
                   </button>
                 </div>
               </div>
