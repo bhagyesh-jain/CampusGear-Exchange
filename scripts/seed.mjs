@@ -1,6 +1,6 @@
 #!/usr/bin/env node
 /**
- * BookLoop Local Seed Script (Node.js)
+ * CampusGear Exchange Local Seed Script (Node.js)
  * Populates Supabase Postgres and Storage with the demo benchmark dataset.
  *
  * Safety constraint:
@@ -183,7 +183,7 @@ async function runSeed() {
   }
 
   console.log('\n' + '='.repeat(60));
-  console.log('🌱 Starting BookLoop Demo Database Seeding...');
+  console.log('🌱 Starting CampusGear Exchange Demo Database Seeding...');
   console.log('='.repeat(60));
 
   // 1. Seed Institutions
@@ -537,7 +537,7 @@ async function runSeed() {
   console.log('✓ Seeded user block (U2 blocks U8).');
 
   console.log('\n' + '='.repeat(60));
-  console.log('🎉 BOOKLOOP DEMO SEEDING COMPLETE!');
+  console.log('🎉 CAMPUSGEAR DEMO SEEDING COMPLETE!');
   console.log('='.repeat(60) + '\n');
 }
 

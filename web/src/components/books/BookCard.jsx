@@ -16,10 +16,16 @@ export function BookCard({ book }) {
 
   const photoUrl = book.cover_path ? getListingPhotoUrl(book.cover_path) : null;
   const conditionLabel = CONDITION_LABELS[book.condition] || book.condition || 'Used';
+  const isLabGear = book.item_type === 'lab_gear';
 
   return (
     <Link to={`/book/${book.id}`} className="book-card" aria-label={`View details for ${book.title}`}>
       <div className="book-card-image-wrap">
+        {/* Item Type Badge overlay */}
+        <span className={`book-card-badge-type ${isLabGear ? 'badge-gear' : 'badge-book'}`}>
+          {isLabGear ? '⚙️ Lab Gear' : '📖 Book'}
+        </span>
+
         {photoUrl ? (
           <img
             src={photoUrl}
@@ -39,7 +45,7 @@ export function BookCard({ book }) {
           style={{ display: photoUrl ? 'none' : 'block' }}
           aria-hidden="true"
         >
-          📖
+          {isLabGear ? '⚙️' : '📖'}
         </span>
       </div>
 
@@ -49,21 +55,32 @@ export function BookCard({ book }) {
         </h3>
         {book.author && (
           <p className="book-card-author" title={book.author}>
-            by {book.author}
+            {isLabGear ? 'Gear: ' : 'by '}{book.author}
           </p>
         )}
 
         <div className="book-card-meta">
-          <span className="book-card-condition">{conditionLabel}</span>
-          {book.institution_name && (
-            <span className="book-card-institution" title={book.institution_name}>
-              📍 {book.institution_name}
+          {/* Branch & Semester Tag */}
+          {(book.branch || book.semester) && (
+            <span className="book-card-branch-tag">
+              🎓 {book.branch || 'AITR'} • Sem {book.semester || 1}
             </span>
           )}
+          <span className="book-card-condition">{conditionLabel}</span>
         </div>
+
+        {/* Pickup location indicator */}
+        {book.pickup_point && (
+          <div className="book-card-pickup" title={`Pickup: ${book.pickup_point}`}>
+            📍 {book.pickup_point}
+          </div>
+        )}
 
         <div className="book-card-footer">
           <span className="book-card-price">{formatPaise(book.price_paise)}</span>
+          <span className="book-card-exchange-type" style={{ fontSize: '11px', color: '#6B7280', fontWeight: '500' }}>
+            {book.exchange_type || (book.price_paise === 0 ? 'Give Away' : 'Sell')}
+          </span>
         </div>
       </div>
     </Link>

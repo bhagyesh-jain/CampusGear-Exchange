@@ -19,6 +19,8 @@ web/dist/
 web/.env.local
 scripts/.env
 scripts/.credentials.local
+BookLoop_Login_Credentials.docx
+*.docx
 !.env.example
 !web/.env.example
 !scripts/.env.example

@@ -4,8 +4,11 @@ import { supabase } from '../lib/supabase';
 import { useAuth } from '../context/AuthContext';
 import { formatPaise } from '../lib/money';
 import { getListingPhotoUrl } from '../lib/storage';
+import { PICKUP_POINTS } from '../lib/demoData';
+import { HandoverTracker } from '../components/ui/HandoverTracker';
 import { Button } from '../components/ui/Button';
 import { Card } from '../components/ui/Card';
+import { Field } from '../components/ui/Field';
 import { EmptyState } from '../components/ui/EmptyState';
 import { ErrorState } from '../components/ui/ErrorState';
 import { Spinner } from '../components/ui/Spinner';
@@ -28,6 +31,13 @@ export function RequestsPage() {
   const [whatsAppPromptOpen, setWhatsAppPromptOpen] = useState(false);
   const [pendingAcceptId, setPendingAcceptId] = useState(null);
 
+  // Pickup Scheduling Modal State (for sellers)
+  const [scheduleModalOpen, setScheduleModalOpen] = useState(false);
+  const [schedulingReq, setSchedulingReq] = useState(null);
+  const [schedulePoint, setSchedulePoint] = useState(PICKUP_POINTS[0]);
+  const [scheduleTime, setScheduleTime] = useState('Tomorrow 1:15 PM (Lunch Break)');
+  const [schedulingLoading, setSchedulingLoading] = useState(false);
+
   // Toast notifications
   const [toast, setToast] = useState(null);
 
@@ -49,12 +59,20 @@ export function RequestsPage() {
           id,
           message,
           status,
+          pickup_point,
+          pickup_time,
           created_at,
           responded_at,
+          scheduled_at,
+          handed_over_at,
           listing:listings (
             id,
             title,
             author,
+            item_type,
+            branch,
+            semester,
+            pickup_point,
             price_paise,
             condition,
             status,
@@ -75,12 +93,20 @@ export function RequestsPage() {
           id,
           message,
           status,
+          pickup_point,
+          pickup_time,
           created_at,
           responded_at,
+          scheduled_at,
+          handed_over_at,
           listing:listings (
             id,
             title,
             author,
+            item_type,
+            branch,
+            semester,
+            pickup_point,
             price_paise,
             condition,
             status,
@@ -173,7 +199,7 @@ export function RequestsPage() {
 
       showToast(
         action === 'accept'
-          ? 'Request accepted! The buyer can now reach out via WhatsApp.'
+          ? 'Request accepted! You can now schedule campus pickup coordination.'
           : 'Request declined.',
         'success'
       );
@@ -186,6 +212,65 @@ export function RequestsPage() {
       } else {
         showToast(err.message || `Unable to ${action} request.`, 'error');
       }
+    } finally {
+      setActionInProgress((prev) => ({ ...prev, [requestId]: false }));
+    }
+  };
+
+  // Open Schedule Pickup Modal (Seller)
+  const handleOpenScheduleModal = (req) => {
+    setSchedulingReq(req);
+    setSchedulePoint(req.pickup_point || req.listing?.pickup_point || PICKUP_POINTS[0]);
+    setScheduleTime(req.pickup_time || 'Tomorrow 1:15 PM (Lunch Break)');
+    setScheduleModalOpen(true);
+  };
+
+  // Submit Schedule Pickup (Seller)
+  const handleScheduleSubmit = async (e) => {
+    e.preventDefault();
+    if (!schedulingReq) return;
+
+    setSchedulingLoading(true);
+    try {
+      const { error: rpcError } = await supabase.rpc('schedule_pickup', {
+        p_request_id: schedulingReq.id,
+        p_pickup_point: schedulePoint,
+        p_pickup_time: scheduleTime.trim() || 'Tomorrow 1:15 PM (Lunch Break)',
+      });
+
+      if (rpcError) throw rpcError;
+
+      showToast('Campus pickup scheduled successfully!', 'success');
+      setScheduleModalOpen(false);
+      setSchedulingReq(null);
+      await fetchRequests();
+    } catch (err) {
+      console.error('Failed to schedule pickup:', err);
+      showToast(err.message || 'Failed to schedule pickup.', 'error');
+    } finally {
+      setSchedulingLoading(false);
+    }
+  };
+
+  // Handle Mark Handed Over (Both Seller & Buyer can mark)
+  const handleMarkHandedOver = async (requestId) => {
+    if (!window.confirm('Confirm that the item has been physically handed over on campus? This closes the listing as sold and completes the loop!')) {
+      return;
+    }
+
+    setActionInProgress((prev) => ({ ...prev, [requestId]: true }));
+    try {
+      const { error: rpcError } = await supabase.rpc('mark_handed_over', {
+        p_request_id: requestId,
+      });
+
+      if (rpcError) throw rpcError;
+
+      showToast('Item marked as Handed Over! Exchange complete and listing closed.', 'success');
+      await fetchRequests();
+    } catch (err) {
+      console.error('Failed to mark handed over:', err);
+      showToast(err.message || 'Failed to complete handover.', 'error');
     } finally {
       setActionInProgress((prev) => ({ ...prev, [requestId]: false }));
     }
@@ -208,7 +293,7 @@ export function RequestsPage() {
 
       // Format digits for wa.me URL: remove non-digits
       const digits = whatsappNumber.replace(/[^0-9]/g, '');
-      const greeting = `Hi ${req.seller?.display_name || 'there'}! I'm interested in buying "${req.listing?.title || 'your textbook'}" on BookLoop.`;
+      const greeting = `Hi ${req.seller?.display_name || 'there'}! I'm coordinating campus pickup for "${req.listing?.title || 'the listing'}" on CampusGear Exchange. Meetup at: ${req.pickup_point || 'Central Library'}.`;
       const waUrl = `https://wa.me/${digits}?text=${encodeURIComponent(greeting)}`;
 
       // Open WhatsApp chat in new window
@@ -258,7 +343,7 @@ export function RequestsPage() {
               WhatsApp Number Required
             </h2>
             <p style={{ fontSize: 'var(--font-size-sm)', color: 'var(--color-text)', marginBottom: 'var(--space-4)', lineHeight: 'var(--line-height-normal)' }}>
-              To accept a buyer's interest request, you must have a WhatsApp number set in your profile. BookLoop shares this number only with buyers whose requests you accept so they can coordinate campus pickup.
+              To accept a buyer's interest request, you must have a WhatsApp number set in your profile. CampusGear shares this number only with buyers whose requests you accept so they can coordinate campus pickup.
             </p>
             <div style={{ display: 'flex', gap: 'var(--space-2)', justifyContent: 'flex-end' }}>
               <Button
@@ -281,11 +366,94 @@ export function RequestsPage() {
         </div>
       )}
 
+      {/* Schedule Pickup Modal (Seller) */}
+      {scheduleModalOpen && schedulingReq && (
+        <div className="request-modal-overlay" role="dialog" aria-modal="true">
+          <div className="request-modal-content">
+            <h2 style={{ fontSize: 'var(--font-size-lg)', color: 'var(--color-navy)', marginBottom: 'var(--space-1)' }}>
+              📅 Schedule Campus Pickup
+            </h2>
+            <p style={{ fontSize: 'var(--font-size-xs)', color: 'var(--color-muted)', marginBottom: 'var(--space-4)' }}>
+              Coordinate meetup for <strong>{schedulingReq.listing?.title}</strong> with {schedulingReq.buyer?.display_name || 'the buyer'}.
+            </p>
+
+            <form onSubmit={handleScheduleSubmit}>
+              <Field
+                label="Designated Campus Pickup Point"
+                as="select"
+                value={schedulePoint}
+                onChange={(e) => setSchedulePoint(e.target.value)}
+                required
+              >
+                {PICKUP_POINTS.map((pt) => (
+                  <option key={pt} value={pt}>
+                    📍 {pt}
+                  </option>
+                ))}
+              </Field>
+
+              <Field
+                label="Pickup Time & Window"
+                placeholder="e.g. Tomorrow 1:15 PM (Lunch Break)"
+                value={scheduleTime}
+                onChange={(e) => setScheduleTime(e.target.value)}
+                required
+              />
+
+              {/* Quick time slot suggestion chips */}
+              <div className="pickup-time-suggestions">
+                <button
+                  type="button"
+                  className="pickup-time-chip"
+                  onClick={() => setScheduleTime('Tomorrow 1:15 PM (Lunch Break)')}
+                >
+                  Tomorrow 1:15 PM
+                </button>
+                <button
+                  type="button"
+                  className="pickup-time-chip"
+                  onClick={() => setScheduleTime('Today 4:30 PM (Post Classes)')}
+                >
+                  Today 4:30 PM
+                </button>
+                <button
+                  type="button"
+                  className="pickup-time-chip"
+                  onClick={() => setScheduleTime('Tomorrow 10:30 AM (Morning Break)')}
+                >
+                  Tomorrow 10:30 AM
+                </button>
+              </div>
+
+              <div style={{ display: 'flex', gap: 'var(--space-2)', justifyContent: 'flex-end', marginTop: 'var(--space-4)' }}>
+                <Button
+                  type="button"
+                  variant="ghost"
+                  onClick={() => {
+                    setScheduleModalOpen(false);
+                    setSchedulingReq(null);
+                  }}
+                >
+                  Cancel
+                </Button>
+                <Button
+                  type="submit"
+                  variant="primary"
+                  loading={schedulingLoading}
+                >
+                  Confirm Schedule
+                </Button>
+              </div>
+            </form>
+          </div>
+        </div>
+      )}
+
       {/* Header */}
       <header className="requests-header">
-        <h1 className="requests-title">Interest Requests</h1>
+        <h1 className="requests-title">Interest Requests & Handover</h1>
         <p className="requests-subtitle">
-          Manage textbook requests, communicate with buyers, and coordinate campus handoffs.
+          Track semester exchange requests, schedule pickup at designated campus spots, and verify peer handover.
         </p>
       </header>
 
@@ -338,10 +506,10 @@ export function RequestsPage() {
             title={tab === 'buying' ? 'No outgoing requests' : 'No incoming requests'}
             message={
               tab === 'buying'
-                ? 'You haven’t expressed interest in any textbooks yet. Browse books to find what you need for class!'
-                : 'You have not received any buyer requests yet. Make sure your textbooks are listed with good descriptions!'
+                ? 'You haven’t expressed interest in any textbooks or lab gear yet. Browse catalog to find what you need!'
+                : 'You have not received any buyer requests yet. Make sure your textbooks or lab equipment are listed with good descriptions!'
             }
-            actionLabel={tab === 'buying' ? 'Browse Books' : '+ Sell a Book'}
+            actionLabel={tab === 'buying' ? 'Browse Catalog' : '+ List an Item'}
             onAction={() => navigate(tab === 'buying' ? '/search' : '/sell')}
           />
         </Card>
@@ -352,21 +520,22 @@ export function RequestsPage() {
             const coverUrl = coverPath ? getListingPhotoUrl(coverPath) : null;
             const isProcessing = !!actionInProgress[req.id];
             const isWhatsAppLoading = !!actionInProgress[`wa_${req.id}`];
+            const isGear = req.listing?.item_type === 'lab_gear';
 
             return (
               <article key={req.id} className="request-card">
                 <div className="request-card-header">
-                  {/* Book summary */}
+                  {/* Item summary */}
                   <div className="request-book-info">
                     <div className="request-book-thumb">
                       {coverUrl ? (
                         <img
                           src={coverUrl}
-                          alt={req.listing?.title || 'Book thumbnail'}
+                          alt={req.listing?.title || 'Item thumbnail'}
                           style={{ width: '100%', height: '100%', objectFit: 'cover' }}
                         />
                       ) : (
-                        '📖'
+                        isGear ? '⚙️' : '📖'
                       )}
                     </div>
                     <div className="request-book-details">
@@ -381,15 +550,22 @@ export function RequestsPage() {
                         <span className="request-book-title">[Listing Deleted]</span>
                       )}
                       <div className="request-book-meta">
-                        {req.listing?.author && <span>by {req.listing.author}</span>}
+                        <span style={{
+                          fontWeight: '700',
+                          color: isGear ? '#B45309' : '#1E3A8A',
+                          backgroundColor: isGear ? '#FEF3C7' : '#EAF2FF',
+                          padding: '1px 6px',
+                          borderRadius: '4px',
+                          fontSize: '0.7rem'
+                        }}>
+                          {isGear ? '⚙️ Lab Gear' : '📖 Book'}
+                        </span>
+                        {req.listing?.branch && (
+                          <span>{req.listing.branch} • Sem {req.listing.semester || 1}</span>
+                        )}
                         {req.listing?.price_paise !== undefined && (
                           <span className="request-book-price">
                             {formatPaise(req.listing.price_paise)}
-                          </span>
-                        )}
-                        {req.listing?.condition && (
-                          <span style={{ textTransform: 'capitalize' }}>
-                            • {req.listing.condition.replace('_', ' ')}
                           </span>
                         )}
                       </div>
@@ -399,14 +575,23 @@ export function RequestsPage() {
                   {/* Status Badge */}
                   <div>
                     <span className={`status-pill ${req.status}`}>
-                      {req.status === 'pending' && '⏳ Pending'}
+                      {req.status === 'pending' && '⏳ Requested'}
                       {req.status === 'accepted' && '✓ Accepted'}
+                      {req.status === 'pickup_scheduled' && '📅 Pickup Scheduled'}
+                      {req.status === 'handed_over' && '🎉 Handed Over'}
                       {req.status === 'declined' && '✕ Declined'}
                       {req.status === 'cancelled' && '⊘ Cancelled'}
                       {req.status === 'closed' && '🔒 Closed'}
                     </span>
                   </div>
                 </div>
+
+                {/* 4-Step Handover Tracker Display */}
+                <HandoverTracker
+                  status={req.status}
+                  pickupPoint={req.pickup_point || req.listing?.pickup_point}
+                  pickupTime={req.pickup_time || req.listing?.pickup_time}
+                />
 
                 {/* Message display */}
                 {req.message && (
@@ -449,19 +634,49 @@ export function RequestsPage() {
                         )}
 
                         {req.status === 'accepted' && (
-                          <button
-                            type="button"
-                            className="btn-whatsapp button button--primary button--sm"
-                            disabled={isWhatsAppLoading}
-                            onClick={() => handleWhatsAppClick(req)}
-                            style={{ display: 'inline-flex', alignItems: 'center', gap: '6px' }}
-                          >
-                            {isWhatsAppLoading ? (
-                              <Spinner size="sm" />
-                            ) : (
-                              <span>💬 Chat on WhatsApp</span>
-                            )}
-                          </button>
+                          <>
+                            <span style={{ fontSize: '0.72rem', color: 'var(--color-muted)' }}>
+                              Waiting for seller to schedule pickup time...
+                            </span>
+                            <button
+                              type="button"
+                              className="btn-whatsapp button button--primary button--sm"
+                              disabled={isWhatsAppLoading}
+                              onClick={() => handleWhatsAppClick(req)}
+                              style={{ display: 'inline-flex', alignItems: 'center', gap: '6px' }}
+                            >
+                              {isWhatsAppLoading ? <Spinner size="sm" /> : <span>💬 Chat on WhatsApp</span>}
+                            </button>
+                          </>
+                        )}
+
+                        {req.status === 'pickup_scheduled' && (
+                          <>
+                            <button
+                              type="button"
+                              className="btn-whatsapp button button--primary button--sm"
+                              disabled={isWhatsAppLoading}
+                              onClick={() => handleWhatsAppClick(req)}
+                              style={{ display: 'inline-flex', alignItems: 'center', gap: '6px' }}
+                            >
+                              {isWhatsAppLoading ? <Spinner size="sm" /> : <span>💬 Chat</span>}
+                            </button>
+                            <Button
+                              variant="primary"
+                              size="sm"
+                              disabled={isProcessing}
+                              onClick={() => handleMarkHandedOver(req.id)}
+                              style={{ backgroundColor: '#059669', borderColor: '#047857' }}
+                            >
+                              {isProcessing ? 'Updating...' : '✓ Mark Handed Over'}
+                            </Button>
+                          </>
+                        )}
+
+                        {req.status === 'handed_over' && (
+                          <span style={{ fontSize: '0.75rem', color: '#065F46', fontWeight: '700' }}>
+                            ✓ Handover Complete (Item Received)
+                          </span>
                         )}
                       </>
                     )}
@@ -488,6 +703,46 @@ export function RequestsPage() {
                               {isProcessing ? 'Accepting...' : 'Accept Request'}
                             </Button>
                           </>
+                        )}
+
+                        {req.status === 'accepted' && (
+                          <>
+                            <Button
+                              variant="primary"
+                              size="sm"
+                              onClick={() => handleOpenScheduleModal(req)}
+                              style={{ backgroundColor: '#243B64', borderColor: '#1E3A8A' }}
+                            >
+                              📅 Schedule Campus Pickup
+                            </Button>
+                          </>
+                        )}
+
+                        {req.status === 'pickup_scheduled' && (
+                          <>
+                            <Button
+                              variant="outline"
+                              size="sm"
+                              onClick={() => handleOpenScheduleModal(req)}
+                            >
+                              Reschedule
+                            </Button>
+                            <Button
+                              variant="primary"
+                              size="sm"
+                              disabled={isProcessing}
+                              onClick={() => handleMarkHandedOver(req.id)}
+                              style={{ backgroundColor: '#059669', borderColor: '#047857' }}
+                            >
+                              {isProcessing ? 'Updating...' : '✓ Mark Handed Over'}
+                            </Button>
+                          </>
+                        )}
+
+                        {req.status === 'handed_over' && (
+                          <span style={{ fontSize: '0.75rem', color: '#065F46', fontWeight: '700' }}>
+                            ✓ Handover Complete (Listing Closed)
+                          </span>
                         )}
                       </>
                     )}

@@ -3,10 +3,15 @@ import {
   DEMO_CATEGORIES,
   DEMO_USERS,
   INITIAL_DEMO_BOOKS,
+  BRANCH_OPTIONS,
+  SEMESTER_OPTIONS,
+  PICKUP_POINTS,
+  ITEM_TYPES,
   generateCoverSvg,
 } from './demoData.js';
 
-const STORAGE_KEY_PREFIX = 'bookloop_demo_';
+const STORAGE_KEY_PREFIX = 'campusgear_demo_';
+const DEMO_VERSION = 'v3_campusgear';
 
 const INITIAL_REPORTS = [
   {
@@ -24,7 +29,7 @@ const INITIAL_REPORTS = [
   {
     id: 'rep-2',
     reporter_id: 'user-rohan',
-    reported_user_id: 'user-kushagra',
+    reported_user_id: 'user-rohan',
     listing_id: 'book-3',
     reason: 'spam',
     details: 'Verified test inquiry.',
@@ -59,8 +64,8 @@ const INITIAL_AUDIT = [
     admin_id: 'user-admin',
     action: 'account_approved',
     target_type: 'user',
-    target_id: 'user-kushagra',
-    details: { message: 'Verified campus credentials for Kushagra Singh Tomar' },
+    target_id: 'user-priya',
+    details: { message: 'Verified campus credentials for Priya Nair' },
     created_at: new Date(Date.now() - 3600000 * 72).toISOString(),
   },
 ];
@@ -107,10 +112,21 @@ function setStored(key, val) {
 
 // Initialize seed data with covers if not already in localStorage
 export function initDemoState() {
+  const currentVersion = getStored('demo_version', null);
+  const isOutdated = currentVersion !== DEMO_VERSION;
+
   let users = getStored('users', null);
-  if (!users) {
+  if (!users || isOutdated) {
     users = DEMO_USERS;
     setStored('users', users);
+  } else {
+    // Ensure Bhagyesh data bug fix is synced if existing storage
+    const bhagyesh = users.find((u) => u.id === 'user-bhagyesh');
+    if (bhagyesh) {
+      bhagyesh.course_or_class = 'B.Tech CSIT, 3rd Year';
+      bhagyesh.graduation_year = 2028;
+      setStored('users', users);
+    }
   }
 
   let institutions = getStored('institutions', null);
@@ -120,7 +136,7 @@ export function initDemoState() {
   }
 
   let categories = getStored('categories', null);
-  if (!categories) {
+  if (!categories || isOutdated) {
     categories = DEMO_CATEGORIES;
     setStored('categories', categories);
   }
@@ -144,18 +160,24 @@ export function initDemoState() {
   }
 
   let listings = getStored('listings', null);
-  if (!listings) {
+  if (!listings || isOutdated) {
     listings = INITIAL_DEMO_BOOKS.map((b) => {
       const coverUrl = generateCoverSvg({
         title: b.title,
         author: b.author,
-        category: categories.find((c) => c.id === b.category_id)?.name || 'Engineering',
+        category: categories.find((c) => c.id === b.category_id)?.name || (b.item_type === 'lab_gear' ? 'Lab Gear' : 'Engineering'),
         colorHex: b.cover_color,
         accentHex: b.accent_color,
+        itemType: b.item_type,
       });
 
       return {
         ...b,
+        item_type: b.item_type || 'book',
+        branch: b.branch || 'CSIT',
+        semester: b.semester || 1,
+        pickup_point: b.pickup_point || 'AITR Central Library',
+        pickup_time: b.pickup_time || 'Lunch Break (1:15 - 2:00 PM)',
         images: [coverUrl],
         listing_images: [
           { id: `img-${b.id}-1`, listing_id: b.id, storage_path: coverUrl, display_order: 1 },
@@ -166,44 +188,58 @@ export function initDemoState() {
   }
 
   let requests = getStored('requests', null);
-  if (!requests) {
+  if (!requests || isOutdated) {
     requests = [
-      // Kushagra has an accepted request on Bhagyesh's Operating System Concepts
+      // Priya has an accepted request on Bhagyesh's Operating System Concepts
       {
         id: 'req-demo-1',
         listing_id: 'book-1',
-        buyer_id: 'user-kushagra',
+        buyer_id: 'user-priya',
         seller_id: 'user-bhagyesh',
         message: 'Hi Bhagyesh, I have CS301 OS lab tomorrow. Can we meet near AITR Central Library during lunch?',
         status: 'accepted',
+        pickup_point: 'CSIT Block',
+        pickup_time: 'Tomorrow 1:30 PM (Lunch Break)',
         created_at: new Date(Date.now() - 3600000 * 3).toISOString(),
         responded_at: new Date(Date.now() - 3600000 * 1).toISOString(),
+        scheduled_at: null,
+        handed_over_at: null,
       },
-      // Kushagra has a pending request on Bhagyesh's Introduction to Algorithms
+      // Rohan has a pending request on Bhagyesh's Introduction to Algorithms
       {
         id: 'req-demo-2',
         listing_id: 'book-2',
-        buyer_id: 'user-kushagra',
+        buyer_id: 'user-rohan',
         seller_id: 'user-bhagyesh',
         message: 'Hey, is this still available? I want to buy the CLRS algorithms book.',
         status: 'pending',
+        pickup_point: 'AITR Central Library',
+        pickup_time: null,
         created_at: new Date(Date.now() - 3600000 * 1).toISOString(),
         responded_at: null,
+        scheduled_at: null,
+        handed_over_at: null,
       },
-      // Priya has a pending request on Kushagra's Math book
+      // Priya has a pending request on Bhagyesh's Math book
       {
         id: 'req-demo-3',
         listing_id: 'book-3',
         buyer_id: 'user-priya',
-        seller_id: 'user-kushagra',
+        seller_id: 'user-bhagyesh',
         message: 'Interested in Grewal Engineering Math!',
         status: 'pending',
+        pickup_point: 'Main Canteen',
+        pickup_time: null,
         created_at: new Date(Date.now() - 3600000 * 2).toISOString(),
         responded_at: null,
+        scheduled_at: null,
+        handed_over_at: null,
       },
     ];
     setStored('requests', requests);
   }
+
+  setStored('demo_version', DEMO_VERSION);
 
   // Active session - default to null (logged out) so user starts signed out
   let activeUserId = getStored('active_user_id', null);
@@ -232,14 +268,14 @@ export class DemoStore {
     const target = users.find((u) => u.id === userId);
     if (target) {
       setStored('active_user_id', userId);
-      window.dispatchEvent(new CustomEvent('bookloop_auth_change', { detail: target }));
+      window.dispatchEvent(new CustomEvent('campusgear_auth_change', { detail: target }));
     }
     return target;
   }
 
   static clearActiveUser() {
     setStored('active_user_id', null);
-    window.dispatchEvent(new CustomEvent('bookloop_auth_change', { detail: null }));
+    window.dispatchEvent(new CustomEvent('campusgear_auth_change', { detail: null }));
   }
 
   static getInstitutions() {
@@ -471,7 +507,19 @@ export class DemoStore {
     return getStored('requests', []);
   }
 
-  static searchListings({ query, category, institution, minPrice, maxPrice, sort = 'newest', limit = 24, offset = 0 }) {
+  static searchListings({
+    query,
+    category,
+    institution,
+    branch,
+    semester,
+    item_type,
+    minPrice,
+    maxPrice,
+    sort = 'newest',
+    limit = 24,
+    offset = 0,
+  }) {
     let list = this.getListings().filter((b) => b.status === 'active');
     const institutions = this.getInstitutions();
     const categories = this.getCategories();
@@ -482,7 +530,10 @@ export class DemoStore {
       list = list.filter((b) =>
         (b.title || '').toLowerCase().includes(q) ||
         (b.author || '').toLowerCase().includes(q) ||
-        (b.course_or_exam || '').toLowerCase().includes(q)
+        (b.course_or_exam || '').toLowerCase().includes(q) ||
+        (b.branch || '').toLowerCase().includes(q) ||
+        (b.description || '').toLowerCase().includes(q) ||
+        (b.pickup_point || '').toLowerCase().includes(q)
       );
     }
 
@@ -492,6 +543,18 @@ export class DemoStore {
 
     if (institution) {
       list = list.filter((b) => b.institution_id === institution);
+    }
+
+    if (branch) {
+      list = list.filter((b) => b.branch === branch);
+    }
+
+    if (semester !== null && semester !== undefined && semester !== '') {
+      list = list.filter((b) => String(b.semester) === String(semester));
+    }
+
+    if (item_type) {
+      list = list.filter((b) => (b.item_type || 'book') === item_type);
     }
 
     if (minPrice !== null && minPrice !== undefined) {
@@ -520,7 +583,14 @@ export class DemoStore {
         id: b.id,
         title: b.title,
         author: b.author,
-        category_name: cat?.name || 'Textbook',
+        category_name: cat?.name || (b.item_type === 'lab_gear' ? 'Lab Gear' : 'Textbook'),
+        category_id: b.category_id,
+        item_type: b.item_type || 'book',
+        exchange_type: b.exchange_type || (b.price_paise === 0 ? 'Give Away' : 'Sell'),
+        branch: b.branch || 'CSIT',
+        semester: b.semester || 1,
+        pickup_point: b.pickup_point || 'AITR Central Library',
+        pickup_time: b.pickup_time || null,
         condition: b.condition,
         price_paise: b.price_paise,
         created_at: b.created_at,
@@ -545,8 +615,14 @@ export class DemoStore {
 
     return {
       ...book,
+      item_type: book.item_type || 'book',
+      exchange_type: book.exchange_type || (book.price_paise === 0 ? 'Give Away' : 'Sell'),
+      branch: book.branch || 'CSIT',
+      semester: book.semester || 1,
+      pickup_point: book.pickup_point || 'AITR Central Library',
+      pickup_time: book.pickup_time || null,
       institution: inst || { name: 'Acropolis Institute of Technology and Research', city: 'Indore' },
-      category: cat || { name: 'Engineering' },
+      category: cat || { name: book.item_type === 'lab_gear' ? 'Lab Gear' : 'Engineering' },
       seller: { id: seller?.id, display_name: seller?.display_name || 'Campus Student' },
       listing_images: book.listing_images || [{ id: 'img-1', storage_path: book.images?.[0], display_order: 1 }],
     };
@@ -559,25 +635,33 @@ export class DemoStore {
     const listings = this.getListings();
     const categories = this.getCategories();
     const cat = categories.find((c) => c.id === payload.p_category_id);
+    const itemType = payload.p_item_type || (cat?.id === 'cat-labgear' ? 'lab_gear' : 'book');
 
     const coverUrl = (payload.p_image_paths && payload.p_image_paths[0]) || generateCoverSvg({
       title: payload.p_title,
       author: payload.p_author,
-      category: cat?.name || 'Textbook',
-      colorHex: '#1E3A8A',
+      category: cat?.name || (itemType === 'lab_gear' ? 'Lab Gear' : 'Textbook'),
+      colorHex: itemType === 'lab_gear' ? '#0F766E' : '#1E3A8A',
       accentHex: '#F4C95D',
+      itemType: itemType,
     });
 
-    const newBookId = `book-${Date.now()}`;
+    const newBookId = `${itemType === 'lab_gear' ? 'gear' : 'book'}-${Date.now()}`;
     const newBook = {
       id: newBookId,
+      item_type: itemType,
+      exchange_type: payload.p_exchange_type || 'Sell / Lend / Give Away',
       title: payload.p_title,
       author: payload.p_author || 'Unknown',
       edition: payload.p_edition || '',
       category_id: payload.p_category_id,
+      branch: payload.p_branch || 'CSIT',
+      semester: Number(payload.p_semester) || 1,
       course_or_exam: payload.p_course_or_exam || '',
       condition: payload.p_condition,
       price_paise: payload.p_price_paise,
+      pickup_point: payload.p_pickup_point || 'AITR Central Library',
+      pickup_time: payload.p_pickup_time || null,
       description: payload.p_description || '',
       status: 'active',
       seller_id: activeUser.id,
@@ -597,6 +681,46 @@ export class DemoStore {
     return newBookId;
   }
 
+  static updateListing(payload) {
+    const activeUser = this.getActiveUser();
+    if (!activeUser) throw new Error('Unauthorized');
+
+    const listings = [...this.getListings()];
+    const book = listings.find((b) => b.id === payload.p_listing_id);
+    if (!book) throw new Error('Listing not found');
+
+    if (book.seller_id !== activeUser.id && activeUser.role !== 'admin') {
+      throw new Error('You do not have permission to edit this listing.');
+    }
+
+    if (payload.p_title) book.title = payload.p_title.trim();
+    if (payload.p_author !== undefined) book.author = payload.p_author ? payload.p_author.trim() : '';
+    if (payload.p_edition !== undefined) book.edition = payload.p_edition ? payload.p_edition.trim() : '';
+    if (payload.p_category_id) book.category_id = payload.p_category_id;
+    if (payload.p_item_type) book.item_type = payload.p_item_type;
+    if (payload.p_exchange_type) book.exchange_type = payload.p_exchange_type;
+    if (payload.p_branch) book.branch = payload.p_branch;
+    if (payload.p_semester) book.semester = Number(payload.p_semester);
+    if (payload.p_course_or_exam !== undefined) book.course_or_exam = payload.p_course_or_exam ? payload.p_course_or_exam.trim() : '';
+    if (payload.p_condition) book.condition = payload.p_condition;
+    if (payload.p_price_paise !== undefined) book.price_paise = payload.p_price_paise;
+    if (payload.p_pickup_point) book.pickup_point = payload.p_pickup_point;
+    if (payload.p_pickup_time !== undefined) book.pickup_time = payload.p_pickup_time;
+    if (payload.p_description !== undefined) book.description = payload.p_description ? payload.p_description.trim() : '';
+    if (payload.p_image_paths && payload.p_image_paths.length > 0) {
+      book.images = payload.p_image_paths;
+      book.listing_images = payload.p_image_paths.map((path, idx) => ({
+        id: `img-${book.id}-${idx + 1}`,
+        listing_id: book.id,
+        storage_path: path,
+        display_order: idx + 1,
+      }));
+    }
+
+    setStored('listings', listings);
+    return true;
+  }
+
   static createInterestRequest({ p_listing_id, p_message }) {
     const activeUser = this.getActiveUser();
     if (!activeUser) throw new Error('Please sign in to send an interest request.');
@@ -604,14 +728,14 @@ export class DemoStore {
     const listings = this.getListings();
     const book = listings.find((b) => b.id === p_listing_id);
     if (!book) throw new Error('Listing not found.');
-    if (book.seller_id === activeUser.id) throw new Error('You cannot request your own book.');
-    if (book.status !== 'active') throw new Error('This book is no longer available.');
+    if (book.seller_id === activeUser.id) throw new Error('You cannot request your own listing.');
+    if (book.status !== 'active') throw new Error('This listing is no longer available.');
 
     const requests = this.getRequests();
     const existing = requests.find(
-      (r) => r.listing_id === p_listing_id && r.buyer_id === activeUser.id && ['pending', 'accepted'].includes(r.status)
+      (r) => r.listing_id === p_listing_id && r.buyer_id === activeUser.id && ['pending', 'accepted', 'pickup_scheduled'].includes(r.status)
     );
-    if (existing) throw new Error('You already have an active request for this book.');
+    if (existing) throw new Error('You already have an active request for this item.');
 
     const newReqId = `req-${Date.now()}`;
     const newReq = {
@@ -619,10 +743,14 @@ export class DemoStore {
       listing_id: p_listing_id,
       buyer_id: activeUser.id,
       seller_id: book.seller_id,
-      message: p_message || "Hi, I'm interested in purchasing your book!",
+      message: p_message || `Hi, I'm interested in getting your ${book.item_type === 'lab_gear' ? 'lab gear' : 'textbook'}!`,
       status: 'pending',
+      pickup_point: book.pickup_point || 'AITR Central Library',
+      pickup_time: null,
       created_at: new Date().toISOString(),
       responded_at: null,
+      scheduled_at: null,
+      handed_over_at: null,
     };
 
     requests.unshift(newReq);
@@ -654,14 +782,92 @@ export class DemoStore {
     return true;
   }
 
+  static schedulePickup({ p_request_id, p_pickup_point, p_pickup_time }) {
+    const activeUser = this.getActiveUser();
+    if (!activeUser) throw new Error('Please sign in to schedule pickup.');
+
+    const requests = this.getRequests();
+    const req = requests.find((r) => r.id === p_request_id);
+    if (!req) throw new Error('Request not found.');
+    if (req.seller_id !== activeUser.id) throw new Error('Only the seller can schedule campus pickup.');
+    if (!['accepted', 'pickup_scheduled'].includes(req.status)) {
+      throw new Error('Pickup can only be scheduled for accepted requests.');
+    }
+
+    req.pickup_point = p_pickup_point || req.pickup_point || 'AITR Central Library';
+    req.pickup_time = p_pickup_time || 'Lunch Break (1:15 - 2:00 PM)';
+    req.status = 'pickup_scheduled';
+    req.scheduled_at = new Date().toISOString();
+
+    setStored('requests', requests);
+    return true;
+  }
+
+  static markHandedOver({ p_request_id }) {
+    const activeUser = this.getActiveUser();
+    if (!activeUser) throw new Error('Please sign in to update handover status.');
+
+    const requests = this.getRequests();
+    const req = requests.find((r) => r.id === p_request_id);
+    if (!req) throw new Error('Request not found.');
+
+    const isParty = req.seller_id === activeUser.id || req.buyer_id === activeUser.id || activeUser.role === 'admin';
+    if (!isParty) throw new Error('Only the seller, buyer, or admin can mark an item as handed over.');
+
+    if (!['pickup_scheduled', 'accepted'].includes(req.status)) {
+      throw new Error('Item must be accepted or scheduled before completing handover.');
+    }
+
+    req.status = 'handed_over';
+    req.handed_over_at = new Date().toISOString();
+
+    // Mark listing sold like Mark Sold does
+    const listings = this.getListings();
+    const book = listings.find((b) => b.id === req.listing_id);
+    if (book) {
+      book.status = 'sold';
+      book.sold_at = new Date().toISOString();
+    }
+
+    // Close remaining pending or accepted requests for this item
+    requests.forEach((r) => {
+      if (r.listing_id === req.listing_id && r.id !== req.id && ['pending', 'accepted'].includes(r.status)) {
+        r.status = 'closed';
+      }
+    });
+
+    setStored('requests', requests);
+    setStored('listings', listings);
+    return true;
+  }
+
+  static cancelRequest({ p_request_id }) {
+    const activeUser = this.getActiveUser();
+    if (!activeUser) throw new Error('Please sign in to cancel your request.');
+
+    const requests = this.getRequests();
+    const req = requests.find((r) => r.id === p_request_id);
+    if (!req) throw new Error('Request not found.');
+    if (req.buyer_id !== activeUser.id) throw new Error('Only the buyer can cancel this request.');
+    if (req.status !== 'pending') throw new Error('Only pending requests can be cancelled.');
+
+    req.status = 'cancelled';
+    setStored('requests', requests);
+    return true;
+  }
+
   static getSellerContact(p_request_id) {
     const activeUser = this.getActiveUser();
     const requests = this.getRequests();
     const req = requests.find((r) => r.id === p_request_id);
 
     if (!req) throw new Error('Request not found.');
-    if (req.buyer_id !== activeUser.id) throw new Error('Unauthorized.');
-    if (req.status !== 'accepted') throw new Error('Request is not accepted yet.');
+    if (req.buyer_id !== activeUser.id && req.seller_id !== activeUser.id && activeUser?.role !== 'admin') {
+      throw new Error('Unauthorized.');
+    }
+    if (!['accepted', 'pickup_scheduled', 'handed_over'].includes(req.status)) {
+      throw new Error('Contact is only revealed after request acceptance.');
+    }
 
     const users = this.getUsers();
     const seller = users.find((u) => u.id === req.seller_id);
@@ -684,7 +890,7 @@ export class DemoStore {
     // Close remaining pending requests atomically
     const requests = this.getRequests();
     requests.forEach((r) => {
-      if (r.listing_id === p_id && r.status === 'pending') {
+      if (r.listing_id === p_id && ['pending', 'accepted'].includes(r.status)) {
         r.status = 'closed';
       }
     });
@@ -709,4 +915,3 @@ export class DemoStore {
     return true;
   }
 }
-

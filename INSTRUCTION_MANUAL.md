@@ -1,7 +1,7 @@
-# BookLoop — Complete Deployment & Setup Instruction Manual
+# CampusGear Exchange — Complete Deployment & Setup Instruction Manual
 
-> **Project:** BookLoop — Campus Second-Hand Textbook Marketplace  
-> **Engineered by:** Kushagra Singh Tomar & Bhagyesh Jain  
+> **Project:** CampusGear Exchange — Semester Textbook & Lab-Gear Exchange Board  
+> **Engineered by:** Bhagyesh Jain  
 > **Institution:** Acropolis Institute of Technology and Research (AITR), Indore  
 > **Architecture:** Pure React 18 + Vite Frontend with Supabase Backend-as-a-Service (PostgreSQL, RLS, Auth, Storage)
 
@@ -23,7 +23,7 @@
 
 ## 1. Architecture & Philosophy
 
-BookLoop eliminates custom backend servers (e.g. Flask/Express) in favor of a **Serverless Database-First Architecture**:
+CampusGear Exchange eliminates custom backend servers (e.g. Flask/Express) in favor of a **Serverless Database-First Architecture**:
 - **Frontend**: React 18, Vite, React Router v6, plain semantic CSS with custom design tokens (`tokens.css`).
 - **Backend & Database**: Supabase PostgreSQL.
 - **Security**: Row Level Security (RLS) on every table and PostgreSQL `SECURITY DEFINER` stored procedure functions with locked `search_path = ''`.
@@ -46,7 +46,7 @@ Make sure the following tools are installed on your machine:
 
 1. Log into your [Supabase Dashboard](https://supabase.com/dashboard).
 2. Click **New Project**.
-3. Choose an organization, enter Project Name: `BookLoop`, and set a strong database password.
+3. Choose an organization, enter Project Name: `CampusGear`, and set a strong database password.
 4. Select your preferred region (e.g. `ap-south-1` / Mumbai for India).
 5. Once your project finishes provisioning, navigate to **Project Settings (⚙️) → API**:
    - Copy **Project URL** (e.g. `https://xyzproject.supabase.co`).
@@ -91,31 +91,31 @@ Run the 5 migration scripts located in `supabase/migrations/` in sequential orde
 
 Verify the storage bucket in your **Supabase Dashboard → Storage**:
 1. Check that the bucket `listing-images` is present.
-2. Ensure **Public bucket** is checked (textbook photos are public listing media).
+2. Ensure **Public bucket** is checked (photos are public listing media).
 3. If not created automatically by `0004_storage.sql`, create a bucket named `listing-images` with Public enabled and 2097152 bytes (2MB) limit.
 
 ---
 
 ## Step 4: Provisioning Base User Accounts
 
-We provide an idempotent Node.js script to provision the three primary accounts:
-- **Kushagra Singh Tomar** (`kushagrasingh@gmail.com`) — Student Buyer / Seller
-- **Bhagyesh Jain** (`bhagyeshjain@gmail.com`) — Student Buyer / Seller
-- **BookLoop Admin** (`admin@bookloop.test`) — Platform Administrator
+We provide an idempotent Node.js script to provision the primary accounts:
+- **Bhagyesh Jain** (`bhagyeshjain@gmail.com`) — Student Seller / Buyer (B.Tech CSIT, 3rd Year, graduating 2028)
+- **Priya Nair** (`priya.nair@ietdavv.edu`) — Student Buyer / Seller (B.Tech IT, 2nd Year)
+- **CampusGear Admin** (`admin@campusgear.test`) — Platform Administrator
 
 ### Execution:
 1. In the `scripts/` directory, create `scripts/.env`:
    ```env
    SUPABASE_URL=https://your-project.supabase.co
    SUPABASE_SERVICE_ROLE_KEY=your-service-role-key-here
-   SEED_ADMIN_EMAIL=admin@bookloop.test
+   SEED_ADMIN_EMAIL=admin@campusgear.test
    ```
 2. Run the script:
    ```bash
    node scripts/create_base_users.mjs
    ```
 3. The script will:
-   - Create all three accounts with email confirmed.
+   - Create accounts with email confirmed.
    - Assign the `admin` role in `admin_roles` for the admin account.
    - Generate secure 16-character passwords and write them to `scripts/.credentials.local` (gitignored).
    - Display a summary table in your terminal.
@@ -124,7 +124,7 @@ We provide an idempotent Node.js script to provision the three primary accounts:
 
 ## Step 5: Local Frontend Development
 
-### 1. Configure Frontend Environment
+### 1. Configure Frontend Environment (Optional for Live Mode)
 In the `web/` directory, create a `.env.local` file:
 ```bash
 cd web
@@ -137,6 +137,8 @@ VITE_SUPABASE_URL=https://your-project.supabase.co
 VITE_SUPABASE_ANON_KEY=your-anon-public-key
 ```
 
+*(Note: When `.env.local` is omitted or empty, CampusGear Exchange automatically operates in zero-dependency Demo Mode with 18 sample items and instant 1-click logins).*
+
 ### 2. Install Dependencies & Start
 ```bash
 # Inside web/
@@ -144,45 +146,45 @@ npm install
 npm run dev
 ```
 
-Open **`http://localhost:5173`** in your browser. The live BookLoop marketplace will load with real-time Supabase connectivity!
+Open **`http://localhost:5173`** in your browser. The live CampusGear marketplace will load immediately!
 
 ---
 
 ## Step 6: Testing & QA Verification
 
 ### Recommended Walkthrough Test:
-1. **Bhagyesh Lists a Book**:
+1. **Bhagyesh Lists an Item for Exchange**:
    - Sign in as `bhagyeshjain@gmail.com`.
-   - Go to `+ Sell`, upload 1-3 book photos, enter title (e.g. *Operating System Concepts*), category, condition (*Good*), and price in Rupees. Submit.
-2. **Kushagra Sends Interest Request**:
-   - Open an incognito window or sign out and sign in as `kushagrasingh@gmail.com`.
-   - Browse or search the listing on Home/Search. Click the book card to open Details.
-   - Click **"I'm Interested"** and send a request message. Notice seller's phone and email are completely hidden.
-3. **Bhagyesh Accepts & WhatsApp Handshake**:
+   - Go to `+ List Item`, choose item type (Book or Lab Gear), upload 1-3 photos, enter title (e.g. *Engineering Drafter Set*), category, branch (*CSIT*), semester (*1*), pickup point (*AITR Central Library*), condition (*Good*), and price in Rupees. Submit.
+2. **Priya Sends Request**:
+   - Open an incognito window or sign out and sign in as `priya.nair@ietdavv.edu`.
+   - Browse or search the listing on Home/Search. Click the card to open Details.
+   - Click **"🤝 Request Item"** and send a request message. Notice seller's phone and email remain private.
+3. **Bhagyesh Accepts & Schedules Pickup**:
    - Log back into Bhagyesh's account. Navigate to **Requests → Selling**.
-   - If Bhagyesh hasn't set his WhatsApp number yet, click Profile to add `+91...`.
    - Click **Accept**.
-4. **Kushagra Retrieves WhatsApp Contact**:
-   - Under Kushagra's **Requests → Buying**, the request displays **Accepted** and reveals the **"Chat on WhatsApp"** button (`https://wa.me/...`).
-5. **Mark as Sold**:
-   - As Bhagyesh, click **Mark Sold**. The book leaves active search, and open requests close atomically.
+   - Click **Schedule Pickup**, choose location (*AITR Central Library*) and pickup time (*Tomorrow 1:30 PM*).
+4. **Priya Retrieves Contact**:
+   - Under Priya's **Requests → Buying**, the request displays **Pickup Scheduled** and reveals the **"Chat on WhatsApp"** button (`https://wa.me/...`).
+5. **Mark as Handed Over**:
+   - As Bhagyesh or Priya, click **Mark Handed Over**. The item transitions to Handed Over, leaves active search, and open requests close atomically.
 6. **Admin Panel**:
-   - Log in as `admin@bookloop.test`. Navigate to `/admin` to review campus stats, active listings, reported issues, and audit logs.
+   - Log in as `admin@campusgear.test`. Navigate to `/admin` to review campus stats, active listings, reported issues, and audit logs.
 
 ---
 
 ## Step 7: Production Deployment (Vercel)
 
-### 1. Push to GitHub
-Ensure all code is committed to your GitHub repository:
+### 1. Push to a Clean GitHub Repository
+Push your clean repository to GitHub:
 ```bash
-git remote set-url origin https://github.com/kushagra31-coder/BOOKLOOP.git
-git push -u origin clean-main:main
+# Instructions in root README for initializing new remote
+git push -u origin main
 ```
 
 ### 2. Connect to Vercel
 1. Go to [Vercel](https://vercel.com/) and click **Add New → Project**.
-2. Select your `kushagra31-coder/BOOKLOOP` repository.
+2. Select your repository.
 3. Configure settings:
    - **Framework Preset**: Vite
    - **Root Directory**: `web`
@@ -191,7 +193,7 @@ git push -u origin clean-main:main
 4. Add **Environment Variables** in Vercel:
    - `VITE_SUPABASE_URL` = `https://your-project.supabase.co`
    - `VITE_SUPABASE_ANON_KEY` = `your-anon-public-key`
-5. Click **Deploy**. Vercel will build and assign your live production URL (e.g. `https://bookloop-xyz.vercel.app`).
+5. Click **Deploy**. Vercel will build and assign your live production URL (e.g. `https://campusgear.vercel.app`).
 
 ### 3. Update Supabase Auth URL Configuration
 In your **Supabase Dashboard → Authentication → URL Configuration**:
@@ -207,10 +209,10 @@ In your **Supabase Dashboard → Authentication → URL Configuration**:
 ## Troubleshooting & FAQs
 
 ### Q: I see `TypeError: Failed to fetch` on the homepage.
-**Fix**: `web/.env.local` is missing or contains placeholder values. Create `web/.env.local` with your valid `VITE_SUPABASE_URL` and `VITE_SUPABASE_ANON_KEY`, then restart Vite (`Ctrl + C`, `npm run dev`).
+**Fix**: `web/.env.local` is missing or contains placeholder values. Either remove `.env.local` to run in offline Demo Mode, or set valid `VITE_SUPABASE_URL` and `VITE_SUPABASE_ANON_KEY`, then restart Vite (`npm run dev`).
 
 ### Q: Refreshing a route like `/search` or `/profile` gives a 404 on Vercel.
-**Fix**: BookLoop includes [`web/vercel.json`](./web/vercel.json) with single-page application (SPA) rewrites to redirect all routes to `index.html`. Ensure `vercel.json` is deployed.
+**Fix**: CampusGear includes [`web/vercel.json`](./web/vercel.json) with single-page application (SPA) rewrites to redirect all routes to `index.html`. Ensure `vercel.json` is deployed.
 
 ### Q: Image upload fails with `Row Level Security policy violation`.
 **Fix**: Ensure `0004_storage.sql` has been executed in the Supabase SQL editor. It ensures authenticated users can upload files into `listing-images/{uid}/*` matching their auth UID.
@@ -223,5 +225,4 @@ node scripts/create_base_users.mjs --reset-passwords
 
 ---
 
-*BookLoop is maintained by Kushagra Singh Tomar & Bhagyesh Jain. For questions or assistance, contact the development team or submit an issue on GitHub.*
-
+*CampusGear Exchange is developed and maintained by Bhagyesh Jain, Acropolis Institute of Technology and Research (AITR), Indore.*

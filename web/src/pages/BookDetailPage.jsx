@@ -10,6 +10,7 @@ import { Field } from '../components/ui/Field';
 import { Spinner } from '../components/ui/Spinner';
 import { ErrorState } from '../components/ui/ErrorState';
 import { Toast } from '../components/ui/Toast';
+import { HandoverTracker } from '../components/ui/HandoverTracker';
 
 export function BookDetailPage() {
   const { id } = useParams();
@@ -26,6 +27,7 @@ export function BookDetailPage() {
   const [interestMessage, setInterestMessage] = useState('');
   const [sendingInterest, setSendingInterest] = useState(false);
   const [existingRequest, setExistingRequest] = useState(null);
+  const [sellerActiveRequest, setSellerActiveRequest] = useState(null);
 
   const [showReportModal, setShowReportModal] = useState(false);
   const [reportReason, setReportReason] = useState('Incorrect price or fake condition');
@@ -70,13 +72,23 @@ export function BookDetailPage() {
       if (user && user.id !== data.seller_id) {
         const { data: reqData } = await supabase
           .from('interest_requests')
-          .select('id, status')
+          .select('*')
           .eq('listing_id', id)
           .eq('buyer_id', user.id)
-          .in('status', ['pending', 'accepted'])
+          .in('status', ['pending', 'accepted', 'pickup_scheduled', 'handed_over'])
           .maybeSingle();
 
         setExistingRequest(reqData || null);
+      } else if (user && user.id === data.seller_id) {
+        const { data: sReqData } = await supabase
+          .from('interest_requests')
+          .select('*')
+          .eq('listing_id', id)
+          .in('status', ['pending', 'accepted', 'pickup_scheduled', 'handed_over'])
+          .order('created_at', { ascending: false })
+          .maybeSingle();
+
+        setSellerActiveRequest(sReqData || null);
       }
     } catch (err) {
       console.error('Error fetching book:', err);
@@ -344,29 +356,42 @@ export function BookDetailPage() {
 
         {/* Book Details Column */}
         <div>
-          {/* Status Badge */}
-          {listing.status !== 'active' && (
-            <div style={{
+          {/* Status and Item Type Badges */}
+          <div style={{ display: 'flex', gap: '8px', alignItems: 'center', flexWrap: 'wrap', marginBottom: 'var(--space-2)' }}>
+            <span style={{
               display: 'inline-block',
-              padding: '2px 8px',
+              padding: '3px 10px',
               borderRadius: '4px',
               fontSize: 'var(--font-size-xs)',
               fontWeight: 'var(--font-weight-bold)',
-              textTransform: 'uppercase',
-              marginBottom: 'var(--space-2)',
-              backgroundColor: listing.status === 'sold' ? '#D1FAE5' : '#FEE2E2',
-              color: listing.status === 'sold' ? '#065F46' : '#991B1B',
+              backgroundColor: listing.item_type === 'lab_gear' ? '#F4C95D' : '#243B64',
+              color: listing.item_type === 'lab_gear' ? '#1E293B' : '#FFFFFF',
             }}>
-              {listing.status}
-            </div>
-          )}
+              {listing.item_type === 'lab_gear' ? '⚙️ Lab Gear' : '📖 Textbook'}
+            </span>
+
+            {listing.status !== 'active' && (
+              <div style={{
+                display: 'inline-block',
+                padding: '3px 10px',
+                borderRadius: '4px',
+                fontSize: 'var(--font-size-xs)',
+                fontWeight: 'var(--font-weight-bold)',
+                textTransform: 'uppercase',
+                backgroundColor: listing.status === 'sold' ? '#D1FAE5' : '#FEE2E2',
+                color: listing.status === 'sold' ? '#065F46' : '#991B1B',
+              }}>
+                {listing.status}
+              </div>
+            )}
+          </div>
 
           <h1 style={{ fontSize: 'var(--font-size-2xl)', color: 'var(--color-navy)', marginBottom: 'var(--space-2)', lineHeight: 'var(--line-height-tight)' }}>
             {listing.title}
           </h1>
 
           <p style={{ color: 'var(--color-muted)', fontSize: 'var(--font-size-base)', marginBottom: 'var(--space-4)' }}>
-            {listing.author && <span>By {listing.author}</span>}
+            {listing.author && <span>{listing.item_type === 'lab_gear' ? 'Brand/Kit: ' : 'By '}{listing.author}</span>}
             {listing.author && listing.edition && <span> • </span>}
             {listing.edition && <span>{listing.edition}</span>}
           </p>
@@ -381,6 +406,34 @@ export function BookDetailPage() {
             </h2>
 
             <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(180px, 1fr))', gap: 'var(--space-3)' }}>
+              <div>
+                <span style={{ fontSize: 'var(--font-size-xs)', color: 'var(--color-muted)', display: 'block' }}>Exchange Type</span>
+                <span style={{ fontWeight: 'var(--font-weight-semibold)', fontSize: 'var(--font-size-sm)', color: '#0F766E' }}>
+                  🔄 {listing.exchange_type || (listing.price_paise === 0 ? 'Give Away' : 'Sell')}
+                </span>
+              </div>
+
+              <div>
+                <span style={{ fontSize: 'var(--font-size-xs)', color: 'var(--color-muted)', display: 'block' }}>Item Type</span>
+                <span style={{ fontWeight: 'var(--font-weight-semibold)', fontSize: 'var(--font-size-sm)' }}>
+                  {listing.item_type === 'lab_gear' ? '⚙️ Lab Gear' : '📖 Course Textbook'}
+                </span>
+              </div>
+
+              <div>
+                <span style={{ fontSize: 'var(--font-size-xs)', color: 'var(--color-muted)', display: 'block' }}>Branch & Semester</span>
+                <span style={{ fontWeight: 'var(--font-weight-semibold)', fontSize: 'var(--font-size-sm)', color: 'var(--color-navy)' }}>
+                  🎓 {listing.branch || 'AITR'} • Semester {listing.semester || 1}
+                </span>
+              </div>
+
+              <div>
+                <span style={{ fontSize: 'var(--font-size-xs)', color: 'var(--color-muted)', display: 'block' }}>Campus Pickup Point</span>
+                <span style={{ fontWeight: 'var(--font-weight-semibold)', fontSize: 'var(--font-size-sm)', color: '#243B64' }}>
+                  📍 {listing.pickup_point || 'AITR Central Library'}
+                </span>
+              </div>
+
               <div>
                 <span style={{ fontSize: 'var(--font-size-xs)', color: 'var(--color-muted)', display: 'block' }}>Condition</span>
                 <span style={{ fontWeight: 'var(--font-weight-semibold)', fontSize: 'var(--font-size-sm)' }}>
@@ -447,52 +500,59 @@ export function BookDetailPage() {
 
           {/* Owner Actions */}
           {canManage ? (
-            <div style={{ display: 'flex', gap: 'var(--space-3)', flexWrap: 'wrap', marginBottom: 'var(--space-6)' }}>
-              {listing.status !== 'sold' && listing.status !== 'removed' && (
-                <Link to={`/sell/${id}/edit`}>
-                  <Button variant="outline">Edit Listing</Button>
-                </Link>
+            <div style={{ marginBottom: 'var(--space-6)' }}>
+              {sellerActiveRequest && (
+                <div style={{ marginBottom: 'var(--space-4)' }}>
+                  <HandoverTracker
+                    status={sellerActiveRequest.status}
+                    pickupPoint={sellerActiveRequest.pickup_point || listing.pickup_point}
+                    pickupTime={sellerActiveRequest.pickup_time || listing.pickup_time}
+                  />
+                  <div style={{ marginTop: 'var(--space-2)', display: 'flex', justifyContent: 'flex-end' }}>
+                    <Link to="/requests">
+                      <Button variant="outline" size="sm">
+                        Coordinate in Requests &rarr;
+                      </Button>
+                    </Link>
+                  </div>
+                </div>
               )}
 
-              {listing.status === 'active' && (
-                <Button variant="secondary" onClick={handleMarkSold} loading={actionLoading}>
-                  Mark as Sold
+              <div style={{ display: 'flex', gap: 'var(--space-3)', flexWrap: 'wrap' }}>
+                {listing.status !== 'sold' && listing.status !== 'removed' && (
+                  <Link to={`/sell/${id}/edit`}>
+                    <Button variant="outline">Edit Listing</Button>
+                  </Link>
+                )}
+
+                {listing.status === 'active' && (
+                  <Button variant="secondary" onClick={handleMarkSold} loading={actionLoading}>
+                    Mark as Sold
+                  </Button>
+                )}
+
+                <Button variant="danger" onClick={handleRemoveListing} loading={actionLoading}>
+                  Remove Listing
                 </Button>
-              )}
-
-              <Button variant="danger" onClick={handleRemoveListing} loading={actionLoading}>
-                Remove Listing
-              </Button>
+              </div>
             </div>
           ) : (
             /* Buyer Actions */
             <div style={{ marginBottom: 'var(--space-6)' }}>
               {existingRequest ? (
-                <div style={{
-                  backgroundColor: 'var(--color-soft-blue)',
-                  border: '1px solid var(--color-border)',
-                  borderRadius: 'var(--radius-md)',
-                  padding: 'var(--space-3)',
-                  marginBottom: 'var(--space-3)',
-                  display: 'flex',
-                  justifyContent: 'space-between',
-                  alignItems: 'center',
-                  flexWrap: 'wrap',
-                  gap: 'var(--space-2)'
-                }}>
-                  <div>
-                    <div style={{ fontSize: 'var(--font-size-xs)', color: 'var(--color-muted)' }}>
-                      Your Interest Request
-                    </div>
-                    <div style={{ fontWeight: 'var(--font-weight-bold)', color: 'var(--color-navy)', textTransform: 'capitalize' }}>
-                      {existingRequest.status === 'pending' ? '⏳ Pending Seller Response' : '✓ Accepted by Seller'}
-                    </div>
+                <div style={{ marginBottom: 'var(--space-3)' }}>
+                  <HandoverTracker
+                    status={existingRequest.status}
+                    pickupPoint={existingRequest.pickup_point || listing.pickup_point}
+                    pickupTime={existingRequest.pickup_time || listing.pickup_time}
+                  />
+                  <div style={{ display: 'flex', justifyContent: 'flex-end', marginTop: 'var(--space-2)' }}>
+                    <Link to="/requests">
+                      <Button variant="outline" size="sm">
+                        View in My Requests &rarr;
+                      </Button>
+                    </Link>
                   </div>
-                  <Link to="/requests">
-                    <Button variant="outline" size="sm">
-                      View in My Requests &rarr;
-                    </Button>
-                  </Link>
                 </div>
               ) : isAvailable ? (
                 <Button
@@ -507,11 +567,11 @@ export function BookDetailPage() {
                     }
                   }}
                 >
-                  🤝 I'm Interested
+                  🤝 Request Item
                 </Button>
               ) : (
                 <Button variant="secondary" size="lg" fullWidth disabled>
-                  {listing.status === 'sold' ? 'Book Sold' : 'Listing Unavailable'}
+                  {listing.status === 'sold' ? 'Item Handed Over / Sold' : 'Listing Unavailable'}
                 </Button>
               )}
 

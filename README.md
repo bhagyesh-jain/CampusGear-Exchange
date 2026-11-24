@@ -1,159 +1,144 @@
-# BookLoop — Campus Book Marketplace
+# CampusGear Exchange — Semester Textbook & Lab-Gear Exchange Board
 
-> **Campus Second-Hand Textbook Marketplace**  
-> Developed by **Kushagra Singh Tomar** & **Bhagyesh Jain**  
+> **AITR Peer-to-Peer Academic Exchange Platform**  
+> Engineered by **Bhagyesh Jain**  
 > *Acropolis Institute of Technology and Research (AITR), Indore*
 
 ---
 
-BookLoop is a student-first peer-to-peer campus marketplace for buying, selling, and giving away used academic books, textbooks, notes, and study guides. 
+**CampusGear Exchange** is a verified student-first campus exchange platform built for AITR students to buy, sell, lend, and exchange course textbooks and laboratory equipment (drafters, scientific calculators, lab coats, aprons, safety goggles, and toolkits) with zero middleman markups.
 
-Built with **React 18**, **Vite**, and **Supabase** (PostgreSQL, Row Level Security, Auth, and Storage) following the **BookLoop Engineer-Ready MVP Brief**.
+Built with **React 18**, **Vite**, and **Supabase** (PostgreSQL, Row Level Security, Auth, and Storage). Designed with responsive ergonomics (Navy `#243B64`, Soft Blue `#EAF2FF`, Gold `#F4C95D`), accessible WCAG AA standards, and touch targets down to 360px viewport.
 
-> 📖 **Full Setup & Deployment Guide**: For end-to-end instructions on setting up Supabase, running SQL migrations, provisioning accounts, and deploying to Vercel, see the [**Complete Instruction Manual (INSTRUCTION_MANUAL.md)**](./INSTRUCTION_MANUAL.md).
+> 📖 **Deployment & Setup Guide**: For full instructions on connecting a live Supabase backend, database migrations, base user provisioning, and Vercel deployment, see [**INSTRUCTION_MANUAL.md**](./INSTRUCTION_MANUAL.md).
 
 ---
 
-## 🛠️ Tech Stack & Architecture
+## ⚡ Quick Start: Running in Demo Mode
 
-- **Frontend**: React 18, React Router v6, plain responsive CSS with custom design tokens.
-  - Colors: Navy `#243B64`, Soft Blue `#EAF2FF`, Background `#FAFAF7`, Gold `#F4C95D`, Dark `#252525`.
-  - Responsive down to 360px viewport; WCAG AA contrast compliant; touch targets ≥ 44px; accessible `:focus-visible` styling; prefers-reduced-motion support.
-- **Backend & Database**: Supabase PostgreSQL with strict Row Level Security (RLS) on all tables.
-- **Authentication**: Supabase Auth (email/password with institution verification flow).
-- **Storage**: Supabase Storage (`listing-images` bucket) with user-folder isolation and file validation.
-- **Security**: Zero custom backend server. All database operations run through authenticated client queries protected by PostgreSQL RLS or SECURITY DEFINER stored procedures with locked `search_path`. The frontend uses **only** the Supabase anonymous key (`VITE_SUPABASE_ANON_KEY`). The service role key is never bundled, exposed, or committed.
+CampusGear Exchange includes a built-in offline **Demo Mode** requiring **zero configuration, zero external database setup, and zero API keys**.
+
+### 1. Install & Launch
+```bash
+# Clone repository and enter project root
+cd web
+
+# Install frontend dependencies
+npm install
+
+# Start development server
+npm run dev
+```
+
+Open **`http://localhost:5173`** in your browser. The app runs seamlessly in Demo Mode with 18 verified academic items (books and lab gear), branch/semester filtering, pickup coordination, and 4-step handover tracking.
+
+### 2. Built-in Demo Accounts
+- **Bhagyesh Jain** (Seller): `bhagyeshjain@gmail.com` (B.Tech CSIT, 3rd Year, graduating 2028)
+- **Priya Nair** (Buyer): `priya.nair@ietdavv.edu` (B.Tech IT, 2nd Year)
+- Fast 1-click login buttons are available directly on the `/login` page.
+
+---
+
+## 🎯 5-Step Hackathon Demo Walkthrough
+
+Use this exact 5-step script to showcase the core MVP features to hackathon judges:
+
+1. **Step 1: Search CSIT Sem 1 Lab Gear**
+   - Navigate to `/search` or use the home search bar.
+   - Filter by **Item Type**: `⚙️ Lab Gear Only`, **Branch**: `CSIT`, and **Semester**: `Semester 1`.
+   - The catalog filters immediately to show the **Engineering Drafter Set** (Rs 450, Good Condition, AITR Central Library pickup).
+
+2. **Step 2: Request the Drafter as Priya Nair (Buyer)**
+   - Click **Login** and choose the 1-click **Priya Nair (Buyer)** demo login.
+   - Click on the **Engineering Drafter Set** card to open details.
+   - Click **🤝 Request Item** and submit your request note: *"Hi Bhagyesh, I need the drafter for CSIT Sem 1 drawing lab!"*.
+   - Tracker updates to **Step 1: Requested (Pending)**.
+
+3. **Step 3: Accept Request as Bhagyesh Jain (Seller)**
+   - Sign in as **Bhagyesh Jain (Seller)** using the 1-click demo button.
+   - Go to **Requests → Selling**. The incoming request from Priya is displayed.
+   - Click **Accept Request**. The request transitions to **Step 2: Accepted**.
+
+4. **Step 4: Schedule Pickup at Central Library**
+   - Click **Schedule Pickup**.
+   - Select pickup point: **AITR Central Library** and pickup time: **Tomorrow 1:30 PM (Lunch Break)**.
+   - Click **Confirm Pickup**. Both parties now see **Step 3: Pickup Scheduled** with the designated location and time, plus the buyer's WhatsApp contact coordination button.
+
+5. **Step 5: Complete Exchange & Mark Handed Over**
+   - Click **Mark Handed Over** on the tracker.
+   - The status transitions to **Step 4: Handed Over**.
+   - The listing is automatically closed/marked sold, and all pending requests for that item are atomically settled.
+
+---
+
+## 🛠️ Key Architectural Features
+
+1. **Lab Gear & Textbook Catalog**:
+   - First-class support for both course textbooks and physical lab gear (engineering drafters, fx-991 calculators, lab coats, instrument kits).
+   - Dynamic SVG vector covers generated on-the-fly.
+
+2. **Branch & Semester Filtering**:
+   - Filter listings by branch (`CSIT`, `CSE`, `EC`, `EE`, `ME`, `CE`) and semester (`1` to `8`).
+   - Integrated into catalog search RPC and listing creation forms.
+
+3. **Designated Campus Pickup Points**:
+   - Structured handover zones across AITR campus: *AITR Central Library*, *Main Canteen*, *CSIT Block*, *Hostel Gate*, and *Mechanical Workshop*.
+   - Prevents unsafe meetups and ensures predictable campus handshakes.
+
+4. **4-Step Handover Progress Tracker**:
+   - Visual step tracker: `Requested (Pending) → Accepted → Pickup Scheduled → Handed Over`.
+   - Live synchronization across seller and buyer views with atomic listing resolution.
+
+5. **Dual-Mode Operation**:
+   - Runs offline via in-memory/localStorage `DemoStore` or connects to Supabase PostgreSQL with Row Level Security (RLS) policies and SECURITY DEFINER stored procedures.
 
 ---
 
 ## 📁 Repository Structure
 
 ```text
-bookloop/
+campusgear/
 ├── web/                       # React 18 + Vite frontend
 │   ├── src/
-│   │   ├── components/        # Reusable UI, layout, and auth guard components
-│   │   ├── context/           # AuthContext (session, profile, role state)
-│   │   ├── lib/               # Supabase client, money helpers, storage helpers
-│   │   ├── pages/             # Route pages (Home, Search, Details, Sell, Profile, etc.)
-│   │   └── styles/            # CSS tokens and global base styles
-│   ├── .env.example           # Frontend environment variable template
-│   ├── package.json           # Frontend dependencies
+│   │   ├── components/        # Reusable UI, BookCard, HandoverTracker, Layout
+│   │   ├── context/           # AuthContext (session, role state)
+│   │   ├── lib/               # demoData.js, demoStore.js, mockClient.js, supabase.js
+│   │   ├── pages/             # HomePage, SearchPage, BookDetailPage, SellPage, RequestsPage, LoginPage
+│   │   └── styles/            # CSS tokens (Navy #243B64, Soft Blue #EAF2FF, Gold #F4C95D)
+│   ├── tests/                 # Automated verification tests (verifyDemo.test.js)
+│   ├── package.json           # Frontend dependencies (campusgear-web)
 │   └── vite.config.js         # Vite configuration
 ├── supabase/
 │   └── migrations/            # Sequential SQL migrations (0001 - 0005)
 ├── scripts/
 │   ├── create_base_users.mjs  # Local Node provisioner for base accounts
+│   ├── seed.mjs               # Test database seeding script
 │   └── .env.example           # Admin credentials template
 ├── tests/
-│   └── seed_and_security.test.mjs # Integration and RLS test suite (43+ assertions)
-├── .gitignore
+│   └── seed_and_security.test.mjs # Real Supabase integration & security tests
+├── .gitignore                 # Safe gitignore protecting credentials and docx files
+├── vercel.json                # Vercel deployment configuration
+├── INSTRUCTION_MANUAL.md      # Full Supabase & Vercel deployment manual
 └── README.md
 ```
 
 ---
 
-## 🚀 Getting Started
+## 🧪 Verification & Testing
 
-### Prerequisites
+Run the automated demo suite to test all 5 core capabilities in under 1 second:
+```bash
+node web/tests/verifyDemo.test.js
+```
 
-- Node.js (v18 or higher)
-- npm (v9 or higher)
-- A Supabase project
-
-### 1. Configure Frontend Environment
-
-Navigate to the `web` directory and set up your local environment file:
-
+Build verification:
 ```bash
 cd web
-cp .env.example .env.local
+npm run build
 ```
-
-Edit `web/.env.local`:
-
-```env
-VITE_SUPABASE_URL=https://your-project.supabase.co
-VITE_SUPABASE_ANON_KEY=your-anon-key-here
-```
-
-### 2. Install Dependencies & Run
-
-```bash
-npm install
-npm run dev
-```
-
-The application will be running locally at `http://localhost:5173`.
-
----
-
-## 🗄️ Database Setup
-
-Migrations are located in `supabase/migrations/` and should be executed in order in your Supabase SQL Editor:
-
-1. `0001_schema.sql` — Schema definition: tables (`institutions`, `categories`, `profiles`, `profile_private`, `listings`, `listing_images`, `interest_requests`, `reports`, `user_blocks`, `admin_audit`, `admin_roles`, `contact_messages`), indexes, and triggers.
-2. `0002_rls.sql` — Row Level Security (RLS) policies for all tables.
-3. `0003_functions.sql` — SECURITY DEFINER stored procedures with input validation.
-4. `0004_storage.sql` — Storage bucket configuration and image security policies.
-5. `0005_institution_type.sql` — Institution type support (School vs. College).
-
----
-
-## 👤 Base User Provisioning
-
-To provision your official base accounts (Kushagra, Bhagyesh, and BookLoop Admin):
-
-1. Set credentials in `scripts/.env`:
-   ```env
-   SUPABASE_URL=https://your-project.supabase.co
-   SUPABASE_SERVICE_ROLE_KEY=your-service-role-key
-   SEED_ADMIN_EMAIL=admin@bookloop.test
-   ```
-2. Run the provisioning script:
-   ```bash
-   node scripts/create_base_users.mjs
-   ```
-
-Credentials will be displayed once and saved to `scripts/.credentials.local` (which is gitignored).
-
----
-
-## ⚠️ Testing & Seeding Safety Notice
-
-> [!WARNING]
-> The automated test suite (`tests/seed_and_security.test.mjs`) and benchmark seed script (`scripts/seed.mjs`) must **ONLY** be executed against a **separate, dedicated test Supabase project**, never against your production or clean demonstration database.
-
-- `scripts/seed.mjs` populates demo records (`@demo.test` users, listings, requests) and will refuse to execute unless `SEED_ALLOWED=true` and `SEED_DEMO_PASSWORD` are explicitly set in `scripts/.env`.
-- To run integration tests against a test project:
-  ```bash
-  # Inside web/ or root with test environment configured
-  npm --prefix web test
-  ```
-
----
-
-## 🌐 Production Deployment
-
-1. **Build**:
-   ```bash
-   cd web
-   npm run build
-   ```
-2. **Deploy to Vercel / Netlify**:
-   - Set Build Command: `npm run build`
-   - Set Output Directory: `dist`
-   - Configure Single Page Application (SPA) rewrites to redirect all routes to `index.html`.
-   - Set Environment Variables:
-     - `VITE_SUPABASE_URL`
-     - `VITE_SUPABASE_ANON_KEY`
-3. **Configure Supabase Auth Settings**:
-   - In Supabase Dashboard > Authentication > URL Configuration:
-     - Set **Site URL** to your production domain (e.g. `https://your-domain.vercel.app`).
-     - Add `https://your-domain.vercel.app/**` to **Redirect URLs**.
 
 ---
 
 ## 📄 License
 
-MIT
+MIT © Bhagyesh Jain, Acropolis Institute of Technology and Research (AITR), Indore.

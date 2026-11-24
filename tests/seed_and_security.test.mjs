@@ -1,5 +1,5 @@
 /**
- * Vitest Integration Test Suite for BookLoop
+ * Vitest Integration Test Suite for CampusGear Exchange
  * Runs against the real Supabase backend with anon key and user sign-in sessions.
  * Zero mocks used.
  */
@@ -69,7 +69,7 @@ function recordResult(testName, description, passed, details = '') {
   });
 }
 
-describe('BookLoop Real Supabase Security & Functional Tests', () => {
+describe('CampusGear Exchange Real Supabase Security & Functional Tests', () => {
   let anon;
   let u1, u2, u3, u4, u5, u6, u7Admin, u8Suspended;
   let categories = {};

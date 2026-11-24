@@ -17,7 +17,7 @@ export function Layout() {
       {/* Desktop Top Header Navigation (>768px) */}
       <header className="desktop-header">
         <div className="container header-inner">
-          <Link to="/" className="brand-logo" aria-label="BookLoop Home">
+          <Link to="/" className="brand-logo" aria-label="CampusGear Exchange Home">
             <svg
               className="brand-icon"
               width="28"
@@ -40,8 +40,8 @@ export function Layout() {
               <circle cx="16" cy="16" r="3" fill="var(--color-navy)" />
             </svg>
             <span className="brand-text">
-              <span className="brand-primary">Book</span>
-              <span className="brand-accent">Loop</span>
+              <span className="brand-primary">Campus</span>
+              <span className="brand-accent">Gear</span>
             </span>
           </Link>
 
@@ -53,7 +53,7 @@ export function Layout() {
               Search
             </NavLink>
             <NavLink to="/sell" className={({ isActive }) => `nav-link nav-link-sell ${isActive ? 'active' : ''}`}>
-              + Sell
+              + List Item
             </NavLink>
             {user ? (
               <>
@@ -91,7 +91,7 @@ export function Layout() {
       {/* Mobile Top Header (<=768px) */}
       <header className="mobile-header">
         <div className="container mobile-header-inner">
-          <Link to="/" className="brand-logo" aria-label="BookLoop Home">
+          <Link to="/" className="brand-logo" aria-label="CampusGear Exchange Home">
             <svg
               className="brand-icon"
               width="28"
@@ -114,13 +114,13 @@ export function Layout() {
               <circle cx="16" cy="16" r="3" fill="var(--color-navy)" />
             </svg>
             <span className="brand-text">
-              <span className="brand-primary">Book</span>
-              <span className="brand-accent">Loop</span>
+              <span className="brand-primary">Campus</span>
+              <span className="brand-accent">Gear</span>
             </span>
           </Link>
           <div className="mobile-header-actions">
-            <Link to="/sell" className="mobile-sell-btn" aria-label="Post Book for Sale">
-              + Sell
+            <Link to="/sell" className="mobile-sell-btn" aria-label="List Item for Exchange">
+              + List Item
             </Link>
           </div>
         </div>
@@ -144,10 +144,10 @@ export function Layout() {
             <Link to="/contact" className="footer-link">Contact Administrator</Link>
           </div>
           <p className="footer-credits" style={{ fontSize: 'var(--font-size-sm)', color: 'var(--color-navy)', fontWeight: 'var(--font-weight-medium)', marginBottom: 'var(--space-1)' }}>
-            Developed by <strong>Kushagra Singh Tomar</strong> &amp; <strong>Bhagyesh Jain</strong> • Acropolis Institute of Technology and Research
+            Developed by <strong>Bhagyesh Jain</strong>, Acropolis Institute of Technology and Research (AITR), Indore.
           </p>
           <p className="footer-copy">
-            © {new Date().getFullYear()} BookLoop. Campus peer-to-peer textbook marketplace.
+            © {new Date().getFullYear()} CampusGear Exchange. Campus peer-to-peer textbook and lab-gear exchange.
           </p>
         </div>
       </footer>
@@ -164,7 +164,7 @@ export function Layout() {
         </NavLink>
         <NavLink to="/sell" className={({ isActive }) => `mobile-nav-item ${isActive ? 'active' : ''}`}>
           <span className="mobile-nav-icon" aria-hidden="true">➕</span>
-          <span className="mobile-nav-label">Sell</span>
+          <span className="mobile-nav-label">List Item</span>
         </NavLink>
         {isAdmin && (
           <NavLink to="/admin" className={({ isActive }) => `mobile-nav-item ${isActive ? 'active' : ''}`}>

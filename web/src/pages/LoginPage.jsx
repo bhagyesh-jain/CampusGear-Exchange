@@ -243,7 +243,7 @@ export function LoginPage({ initialTab }) {
     <div className="auth-page">
       {/* ── LEFT COLUMN: Navy Editorial Branding ── */}
       <div className="auth-left">
-        <Link to="/" className="auth-left-top" aria-label="Return to BookLoop Home">
+        <Link to="/" className="auth-left-top" aria-label="Return to CampusGear Home">
           <svg width="34" height="34" viewBox="0 0 32 32" fill="none" xmlns="http://www.w3.org/2000/svg">
             <rect width="32" height="32" rx="8" fill="#1B2C4B" />
             <path d="M8 10C8 8.89543 8.89543 8 10 8H15V24H10C8.89543 24 8 23.1046 8 22V10Z" fill="#FFFFFF" opacity="0.9" />
@@ -251,7 +251,7 @@ export function LoginPage({ initialTab }) {
             <circle cx="16" cy="16" r="3" fill="#1B2C4B" />
           </svg>
           <div className="auth-brand-text">
-            Book<span>Loop</span>
+            Campus<span>Gear</span>
           </div>
         </Link>
 
@@ -272,8 +272,8 @@ export function LoginPage({ initialTab }) {
         </div>
 
         <div className="auth-left-foot">
-          © {new Date().getFullYear()} BookLoop &nbsp;·&nbsp; Made for students<br />
-          Developed by <strong>Kushagra Singh Tomar</strong> &amp; <strong>Bhagyesh Jain</strong>
+          © {new Date().getFullYear()} CampusGear Exchange &nbsp;·&nbsp; Made for students<br />
+          Developed by <strong>Bhagyesh Jain</strong>, Acropolis Institute of Technology and Research (AITR), Indore.
         </div>
       </div>
 
@@ -288,7 +288,7 @@ export function LoginPage({ initialTab }) {
                 <path d="M8 10C8 8.89543 8.89543 8 10 8H15V24H10C8.89543 24 8 23.1046 8 22V10Z" fill="#FFFFFF" />
                 <path d="M17 8H22C23.1046 8 24 8.89543 24 10V22C24 23.1046 23.1046 24 22 24H17V8Z" fill="#F4C95D" />
               </svg>
-              <span>BookLoop</span>
+              <span>CampusGear</span>
             </Link>
             <Link to="/" className="auth-back-link">
               ← Back to Browse
@@ -386,34 +386,23 @@ export function LoginPage({ initialTab }) {
                   <button
                     type="button"
                     className="demo-user-btn"
-                    onClick={() => handleDemoSignIn('kushagrasingh@gmail.com', 'Demo@1234')}
-                  >
-                    <span className="demo-user-name">
-                      <span>👤</span> Kushagra Singh Tomar
-                    </span>
-                    <span className="demo-user-role buyer">Buyer</span>
-                  </button>
-
-                  <button
-                    type="button"
-                    className="demo-user-btn"
                     onClick={() => handleDemoSignIn('bhagyeshjain@gmail.com', 'Demo@1234')}
                   >
                     <span className="demo-user-name">
                       <span>👤</span> Bhagyesh Jain
                     </span>
-                    <span className="demo-user-role seller">Seller</span>
+                    <span className="demo-user-role seller">Seller · CSIT 3rd Yr</span>
                   </button>
 
                   <button
                     type="button"
                     className="demo-user-btn"
-                    onClick={() => handleDemoSignIn('admin@bookloop.test', 'Demo@1234')}
+                    onClick={() => handleDemoSignIn('priya.nair@ietdavv.edu', 'Demo@1234')}
                   >
                     <span className="demo-user-name">
-                      <span>🛡️</span> BookLoop Admin
+                      <span>👤</span> Priya Nair
                     </span>
-                    <span className="demo-user-role admin">Admin</span>
+                    <span className="demo-user-role buyer">Buyer · IT 2nd Yr</span>
                   </button>
                 </div>
               </div>
@@ -690,7 +679,7 @@ export function LoginPage({ initialTab }) {
                   <div className="reg-success-title">You're in!</div>
                   <p className="reg-success-sub">
                     Your campus account has been verified and created successfully.<br />
-                    Welcome to the BookLoop student community!
+                    Welcome to the CampusGear student community!
                   </p>
                   <button
                     type="button"

@@ -1,6 +1,7 @@
 import React, { useState, useEffect, useRef, useCallback } from 'react';
 import { useSearchParams } from 'react-router-dom';
 import { supabase } from '../lib/supabase';
+import { BRANCH_OPTIONS, SEMESTER_OPTIONS, ITEM_TYPES } from '../lib/demoData';
 import { Button } from '../components/ui/Button';
 import { Field } from '../components/ui/Field';
 import { EmptyState } from '../components/ui/EmptyState';
@@ -17,6 +18,9 @@ export function SearchPage() {
   const paramQuery = searchParams.get('q') || '';
   const paramCategory = searchParams.get('category') || '';
   const paramInstitution = searchParams.get('institution') || '';
+  const paramBranch = searchParams.get('branch') || '';
+  const paramSemester = searchParams.get('semester') || '';
+  const paramType = searchParams.get('type') || '';
   const paramMin = searchParams.get('min') ?? '';
   const paramMax = searchParams.get('max') ?? '';
   const paramSort = searchParams.get('sort') || 'newest';
@@ -83,6 +87,9 @@ export function SearchPage() {
   const activeFilterCount = [
     paramCategory,
     paramInstitution,
+    paramBranch,
+    paramSemester,
+    paramType,
     paramMin !== '' ? paramMin : null,
     paramMax !== '' ? paramMax : null,
     paramSort !== 'newest' ? paramSort : null,
@@ -111,6 +118,9 @@ export function SearchPage() {
         p_query: paramQuery.trim() || null,
         p_category: paramCategory || null,
         p_institution: paramInstitution || null,
+        p_branch: paramBranch || null,
+        p_semester: paramSemester || null,
+        p_item_type: paramType || null,
         p_min: parsedMin,
         p_max: parsedMax,
         p_sort: paramSort,
@@ -131,12 +141,12 @@ export function SearchPage() {
       }
     } catch (err) {
       console.error('search_listings failed:', err);
-      setError(err.message || 'Failed to search textbooks.');
+      setError(err.message || 'Failed to search catalog.');
     } finally {
       setLoading(false);
       setLoadingMore(false);
     }
-  }, [paramQuery, paramCategory, paramInstitution, paramMin, paramMax, paramSort]);
+  }, [paramQuery, paramCategory, paramInstitution, paramBranch, paramSemester, paramType, paramMin, paramMax, paramSort]);
 
   // Execute search whenever URL parameters change
   useEffect(() => {
@@ -197,6 +207,54 @@ export function SearchPage() {
             )}
           </div>
 
+          {/* Item Type Filter */}
+          <div className="search-filter-group">
+            <Field
+              as="select"
+              label="Item Type"
+              value={paramType}
+              onChange={(e) => updateParam('type', e.target.value)}
+            >
+              <option value="">All Types (Books & Gear)</option>
+              <option value="book">📖 Books Only</option>
+              <option value="lab_gear">⚙️ Lab Gear Only</option>
+            </Field>
+          </div>
+
+          {/* Branch Filter */}
+          <div className="search-filter-group">
+            <Field
+              as="select"
+              label="Branch"
+              value={paramBranch}
+              onChange={(e) => updateParam('branch', e.target.value)}
+            >
+              <option value="">All Branches</option>
+              {BRANCH_OPTIONS.map((br) => (
+                <option key={br} value={br}>
+                  {br}
+                </option>
+              ))}
+            </Field>
+          </div>
+
+          {/* Semester Filter */}
+          <div className="search-filter-group">
+            <Field
+              as="select"
+              label="Semester"
+              value={paramSemester}
+              onChange={(e) => updateParam('semester', e.target.value)}
+            >
+              <option value="">All Semesters</option>
+              {SEMESTER_OPTIONS.map((sem) => (
+                <option key={sem} value={sem}>
+                  Semester {sem}
+                </option>
+              ))}
+            </Field>
+          </div>
+
           {/* Category Filter */}
           <div className="search-filter-group">
             <Field
@@ -240,10 +298,10 @@ export function SearchPage() {
               <input
                 type="text"
                 className="search-main-input"
-                placeholder="Search by title, author, course code..."
+                placeholder="Search by title, branch, drafter, calculator, lab coat..."
                 value={queryInput}
                 onChange={(e) => setQueryInput(e.target.value)}
-                aria-label="Search textbooks"
+                aria-label="Search catalog"
               />
             </div>
 
@@ -252,7 +310,7 @@ export function SearchPage() {
                 as="select"
                 value={paramSort}
                 onChange={(e) => updateParam('sort', e.target.value)}
-                aria-label="Sort books by"
+                aria-label="Sort items by"
               >
                 <option value="newest">Sort: Newest</option>
                 <option value="price_asc">Price: Low to High</option>
@@ -268,8 +326,10 @@ export function SearchPage() {
                 'Searching catalog...'
               ) : (
                 <>
-                  <span className="search-count-bold">{totalCount}</span> {totalCount === 1 ? 'book' : 'books'} found
+                  <span className="search-count-bold">{totalCount}</span> {totalCount === 1 ? 'item' : 'items'} found
                   {paramQuery && ` for "${paramQuery}"`}
+                  {paramBranch && ` • ${paramBranch}`}
+                  {paramSemester && ` • Sem ${paramSemester}`}
                 </>
               )}
             </span>
@@ -290,8 +350,8 @@ export function SearchPage() {
             />
           ) : listings.length === 0 ? (
             <EmptyState
-              title="No books match your criteria"
-              message="Try broadening your keywords, removing category or campus filters, or resetting price bounds."
+              title="No items match your criteria"
+              message="Try broadening your keywords, removing branch, semester, or category filters, or resetting price bounds."
               actionLabel="Clear all filters"
               onAction={clearAllFilters}
             />

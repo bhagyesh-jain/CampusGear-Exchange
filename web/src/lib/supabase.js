@@ -12,7 +12,7 @@ export const isConfigured = Boolean(
 );
 
 // If Supabase keys are provided, connect to live Supabase;
-// Otherwise, seamlessly activate Demo Mode with Indian textbooks, Kushagra & Bhagyesh accounts!
+// Otherwise, seamlessly activate Demo Mode with Indian textbooks & lab gear, and Bhagyesh & Priya accounts!
 export const isDemoMode = !isConfigured;
 
 export const supabase = isConfigured

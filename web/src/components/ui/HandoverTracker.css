@@ -1,0 +1,209 @@
+.handover-tracker-container {
+  background-color: #F8FAFC;
+  border: 1px solid #E2E8F0;
+  border-radius: var(--radius-md);
+  padding: var(--space-3) var(--space-4);
+  margin: var(--space-2) 0;
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.04);
+}
+
+.handover-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: var(--space-3);
+  gap: var(--space-2);
+  flex-wrap: wrap;
+}
+
+.handover-title {
+  font-size: var(--font-size-xs);
+  font-weight: 700;
+  color: #243B64;
+  letter-spacing: 0.03em;
+  text-transform: uppercase;
+}
+
+.handover-step-indicator {
+  font-size: 0.72rem;
+  font-weight: 600;
+  color: #1E3A8A;
+  background-color: #EAF2FF;
+  padding: 2px 8px;
+  border-radius: 12px;
+  border: 1px solid #BFDBFE;
+}
+
+.handover-steps-bar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  position: relative;
+  width: 100%;
+  padding: 4px 0 8px;
+}
+
+.handover-step-node {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  position: relative;
+  z-index: 2;
+  text-align: center;
+  flex: 0 0 auto;
+  max-width: 72px;
+}
+
+.step-circle {
+  width: 28px;
+  height: 28px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 0.75rem;
+  font-weight: 700;
+  background-color: #FFFFFF;
+  border: 2px solid #CBD5E1;
+  color: #64748B;
+  transition: all 0.2s ease;
+}
+
+.step-label {
+  font-size: 0.68rem;
+  font-weight: 600;
+  color: #64748B;
+  margin-top: 4px;
+  white-space: normal;
+  line-height: 1.15;
+  display: block;
+}
+
+/* Active / Current Step */
+.handover-step-node.step-current .step-circle {
+  background-color: #F4C95D;
+  border-color: #D97706;
+  color: #1E293B;
+  box-shadow: 0 0 0 3px #FEF3C7;
+  transform: scale(1.08);
+}
+
+.handover-step-node.step-current .step-label {
+  color: #243B64;
+  font-weight: 800;
+}
+
+/* Done Step */
+.handover-step-node.step-done .step-circle {
+  background-color: #243B64;
+  border-color: #243B64;
+  color: #FFFFFF;
+}
+
+.handover-step-node.step-done .step-label {
+  color: #243B64;
+  font-weight: 600;
+}
+
+/* Connectors between steps */
+.handover-connector {
+  flex: 1;
+  height: 3px;
+  background-color: #E2E8F0;
+  margin: 0 2px 18px;
+  position: relative;
+  z-index: 1;
+  transition: background-color 0.2s ease;
+}
+
+.handover-connector.connector-done {
+  background-color: #243B64;
+}
+
+/* Meetup Coordination Box */
+.handover-coordination-box {
+  margin-top: var(--space-2);
+  padding: var(--space-2) var(--space-3);
+  background-color: #EAF2FF;
+  border: 1px solid #BFDBFE;
+  border-radius: var(--radius-sm);
+  display: flex;
+  gap: var(--space-4);
+  align-items: center;
+  flex-wrap: wrap;
+}
+
+.coord-item {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.coord-icon {
+  font-size: 1rem;
+}
+
+.coord-body {
+  display: flex;
+  flex-direction: column;
+}
+
+.coord-label {
+  font-size: 0.65rem;
+  text-transform: uppercase;
+  font-weight: 700;
+  color: #64748B;
+  letter-spacing: 0.03em;
+}
+
+.coord-value {
+  font-size: 0.8rem;
+  font-weight: 700;
+  color: #243B64;
+}
+
+/* Terminal States */
+.handover-tracker-terminal {
+  padding: var(--space-2) var(--space-3);
+  border-radius: var(--radius-sm);
+  font-size: var(--font-size-xs);
+  font-weight: 600;
+  margin: var(--space-2) 0;
+}
+
+.handover-tracker-terminal.status-declined {
+  background-color: #FEE2E2;
+  color: #991B1B;
+  border: 1px solid #FECACA;
+}
+
+.handover-tracker-terminal.status-cancelled {
+  background-color: #F3F4F6;
+  color: #4B5563;
+  border: 1px solid #E5E7EB;
+}
+
+.handover-tracker-terminal.status-closed {
+  background-color: #F3F4F6;
+  color: #6B7280;
+  border: 1px solid #E5E7EB;
+}
+
+@media (max-width: 480px) {
+  .handover-step-node {
+    max-width: 58px;
+  }
+  .step-circle {
+    width: 24px;
+    height: 24px;
+    font-size: 0.7rem;
+  }
+  .step-label {
+    font-size: 0.62rem;
+  }
+  .handover-coordination-box {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: var(--space-2);
+  }
+}

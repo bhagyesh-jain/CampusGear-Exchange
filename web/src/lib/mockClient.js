@@ -1,8 +1,8 @@
 /**
- * BookLoop Seamless Demo/Mock Supabase Client
+ * CampusGear Exchange Seamless Demo/Mock Supabase Client
  * Intercepts Supabase queries when offline or when VITE_SUPABASE_URL is missing.
  * Allows the entire app to run with full interactive functionality,
- * realistic Indian textbooks, and Kushagra & Bhagyesh accounts!
+ * realistic Indian textbooks & lab gear, and Bhagyesh & Priya accounts!
  */
 
 import { DemoStore } from './demoStore.js';
@@ -158,7 +158,7 @@ class MockQueryBuilder {
         const u = users.find((x) => x.id === idFilter);
         if (u) {
           Object.assign(u, this.updateData);
-          localStorage.setItem('bookloop_demo_users', JSON.stringify(users));
+          localStorage.setItem('campusgear_demo_users', JSON.stringify(users));
         }
       } else if (this.table === 'profile_private') {
         const users = DemoStore.getUsers();
@@ -167,7 +167,7 @@ class MockQueryBuilder {
         if (u) {
           if (this.updateData.whatsapp_number !== undefined) u.whatsapp_number = this.updateData.whatsapp_number;
           if (this.updateData.account_status !== undefined) u.account_status = this.updateData.account_status;
-          localStorage.setItem('bookloop_demo_users', JSON.stringify(users));
+          localStorage.setItem('campusgear_demo_users', JSON.stringify(users));
         }
       }
       return { data: this.updateData, error: null };
@@ -189,8 +189,13 @@ class MockQueryBuilder {
 
       result = all.map((b) => ({
         ...b,
+        item_type: b.item_type || 'book',
+        branch: b.branch || 'CSIT',
+        semester: b.semester || 1,
+        pickup_point: b.pickup_point || 'AITR Central Library',
+        pickup_time: b.pickup_time || null,
         institution: institutions.find((i) => i.id === b.institution_id) || { name: 'AITR Indore', city: 'Indore' },
-        category: categories.find((c) => c.id === b.category_id) || { name: 'Computer Science' },
+        category: categories.find((c) => c.id === b.category_id) || { name: b.item_type === 'lab_gear' ? 'Lab Gear' : 'Computer Science' },
         seller: users.find((u) => u.id === b.seller_id) || { id: b.seller_id, display_name: 'Campus Student' },
         listing_images: b.listing_images || [{ id: 'img-1', storage_path: b.images?.[0], display_order: 1 }],
       }));
@@ -237,8 +242,17 @@ class MockQueryBuilder {
         const seller = users.find((u) => u.id === r.seller_id);
         return {
           ...r,
+          pickup_point: r.pickup_point || book?.pickup_point || 'AITR Central Library',
+          pickup_time: r.pickup_time || null,
+          scheduled_at: r.scheduled_at || null,
+          handed_over_at: r.handed_over_at || null,
           listing: book ? {
             ...book,
+            item_type: book.item_type || 'book',
+            branch: book.branch || 'CSIT',
+            semester: book.semester || 1,
+            pickup_point: book.pickup_point || 'AITR Central Library',
+            pickup_time: book.pickup_time || null,
             images: book.images || [],
             listing_images: book.listing_images || [{ storage_path: book.images?.[0] }],
           } : null,
@@ -308,6 +322,9 @@ export function createMockClient() {
             query: params.p_query,
             category: params.p_category,
             institution: params.p_institution,
+            branch: params.p_branch,
+            semester: params.p_semester,
+            item_type: params.p_item_type,
             minPrice: params.p_min,
             maxPrice: params.p_max,
             sort: params.p_sort || 'newest',
@@ -322,6 +339,11 @@ export function createMockClient() {
           return { data: id, error: null };
         }
 
+        if (funcName === 'update_listing') {
+          DemoStore.updateListing(params);
+          return { data: null, error: null };
+        }
+
         if (funcName === 'create_interest_request') {
           const id = DemoStore.createInterestRequest(params);
           return { data: id, error: null };
@@ -329,6 +351,21 @@ export function createMockClient() {
 
         if (funcName === 'respond_to_request') {
           DemoStore.respondToRequest(params);
+          return { data: null, error: null };
+        }
+
+        if (funcName === 'schedule_pickup') {
+          DemoStore.schedulePickup(params);
+          return { data: null, error: null };
+        }
+
+        if (funcName === 'mark_handed_over') {
+          DemoStore.markHandedOver(params);
+          return { data: null, error: null };
+        }
+
+        if (funcName === 'cancel_request') {
+          DemoStore.cancelRequest(params);
           return { data: null, error: null };
         }
 
@@ -521,11 +558,11 @@ export function createMockClient() {
           callback(u ? 'SIGNED_IN' : 'SIGNED_OUT', session);
         };
 
-        window.addEventListener('bookloop_auth_change', handler);
+        window.addEventListener('campusgear_auth_change', handler);
         return {
           data: {
             subscription: {
-              unsubscribe: () => window.removeEventListener('bookloop_auth_change', handler),
+              unsubscribe: () => window.removeEventListener('campusgear_auth_change', handler),
             },
           },
         };
@@ -536,8 +573,8 @@ export function createMockClient() {
         const em = (email || '').toLowerCase().trim();
         let found = users.find((u) => u.email.toLowerCase() === em);
         if (!found) {
-          if (em.includes('kushagra') || em === 'demo@campus.edu' || em === 'buyer@campus.edu') {
-            found = users.find((u) => u.id === 'user-kushagra');
+          if (em.includes('priya') || em === 'demo@campus.edu' || em === 'buyer@campus.edu') {
+            found = users.find((u) => u.id === 'user-priya');
           } else if (em.includes('bhagyesh') || em === 'seller@campus.edu') {
             found = users.find((u) => u.id === 'user-bhagyesh');
           } else if (em.includes('admin')) {
@@ -577,7 +614,7 @@ export function createMockClient() {
           account_status: 'active',
         };
         users.push(newUser);
-        localStorage.setItem('bookloop_demo_users', JSON.stringify(users));
+        localStorage.setItem('campusgear_demo_users', JSON.stringify(users));
         DemoStore.setActiveUser(newId);
         return { data: { user: newUser }, error: null };
       },

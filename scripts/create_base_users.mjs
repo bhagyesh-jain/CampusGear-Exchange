@@ -1,10 +1,10 @@
 #!/usr/bin/env node
 /**
- * BookLoop Base User Accounts Provisioner (Node.js)
+ * CampusGear Exchange Base User Accounts Provisioner (Node.js)
  * Creates or updates initial production/testing accounts:
- *   1. Kushagra Singh Tomar (kushagrasingh@gmail.com)
+ *   1. Priya Nair (priya.nair@ietdavv.edu)
  *   2. Bhagyesh Jain (bhagyeshjain@gmail.com)
- *   3. BookLoop Admin (admin@bookloop.test or from SEED_ADMIN_EMAIL)
+ *   3. CampusGear Admin (admin@campusgear.test or from SEED_ADMIN_EMAIL)
  *
  * Local execution only. Never imported or exposed to /web.
  */
@@ -82,7 +82,7 @@ async function main() {
   const purgeOthers = process.argv.includes('--purge-others');
 
   console.log('\n' + '='.repeat(65));
-  console.log('👤 Provisioning BookLoop Base User Accounts...');
+  console.log('👤 Provisioning CampusGear Base User Accounts...');
   console.log('='.repeat(65));
 
   // 1. Find or verify target institution: "Acropolis Institute of Technology and Research"
@@ -115,15 +115,15 @@ async function main() {
   console.log(`✓ Using Institution: ${inst.name} (${inst.id})`);
 
   // 2. Define account specifications
-  const adminEmail = (env.SEED_ADMIN_EMAIL || 'admin@bookloop.test').trim().toLowerCase();
+  const adminEmail = (env.SEED_ADMIN_EMAIL || 'admin@campusgear.test').trim().toLowerCase();
 
   const accountsSpec = [
     {
-      key: 'KUSHAGRA',
-      name: 'Kushagra Singh Tomar',
-      email: 'kushagrasingh@gmail.com',
+      key: 'PRIYA',
+      name: 'Priya Nair',
+      email: 'priya.nair@ietdavv.edu',
       isAdmin: false,
-      envPassword: env.SEED_KUSHAGRA_PASSWORD,
+      envPassword: env.SEED_PRIYA_PASSWORD,
     },
     {
       key: 'BHAGYESH',
@@ -134,7 +134,7 @@ async function main() {
     },
     {
       key: 'ADMIN',
-      name: 'BookLoop Admin',
+      name: 'CampusGear Admin',
       email: adminEmail,
       isAdmin: true,
       envPassword: env.SEED_ADMIN_PASSWORD,
@@ -251,7 +251,7 @@ async function main() {
   if (generatedCredentials.length > 0) {
     const credsPath = path.join(__dirname, '.credentials.local');
     const credsContent = [
-      '# BookLoop Generated Account Credentials',
+      '# CampusGear Exchange Generated Account Credentials',
       `# Generated at: ${new Date().toISOString()}`,
       '# This file is strictly local and gitignored.',
       '',

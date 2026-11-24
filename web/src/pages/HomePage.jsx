@@ -72,12 +72,12 @@ export function HomePage() {
     <div className="home-page container">
       {/* Hero Header */}
       <header className="home-hero">
-        <Link to="/" className="home-brand-logo" aria-label="BookLoop Home">
-          <div className="home-logo-icon">B</div>
-          <span className="home-logo-text">BookLoop</span>
+        <Link to="/" className="home-brand-logo" aria-label="CampusGear Home">
+          <div className="home-logo-icon">C</div>
+          <span className="home-logo-text">CampusGear</span>
         </Link>
         <p className="home-subtitle">
-          The verified campus textbook marketplace. Buy and sell course books directly with peers at your college.
+          The verified campus textbook &amp; lab-gear exchange. Buy, sell, lend and exchange course books and lab gear with peers at AITR.
         </p>
 
         {/* Search Bar */}
@@ -86,10 +86,10 @@ export function HomePage() {
             <input
               type="text"
               className="home-search-input"
-              placeholder="Search by title, author, course code..."
+              placeholder="Search by title, branch, drafter, calculator, lab coat..."
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
-              aria-label="Search textbooks"
+              aria-label="Search catalog"
             />
           </div>
           <Button type="submit" variant="primary">
@@ -100,12 +100,12 @@ export function HomePage() {
         <div className="home-hero-actions">
           <Link to="/sell">
             <Button variant="accent">
-              + Sell a Book
+              + List Item
             </Button>
           </Link>
           <Link to="/search">
             <Button variant="outline">
-              Browse All
+              Browse Exchange
             </Button>
           </Link>
         </div>
@@ -138,7 +138,7 @@ export function HomePage() {
             Recently Listed
           </h2>
           <Link to="/search?sort=newest" className="home-view-all-link">
-            View all books &rarr;
+            View all listings &rarr;
           </Link>
         </div>
 
@@ -150,15 +150,15 @@ export function HomePage() {
           </div>
         ) : error ? (
           <ErrorState
-            title="Failed to load textbooks"
+            title="Failed to load items"
             message={error}
             onRetry={fetchHomeData}
           />
         ) : listings.length === 0 ? (
           <EmptyState
-            title="No books listed yet"
-            message="Be the first student to list a textbook on your campus!"
-            actionLabel="List a Book"
+            title="No items listed yet"
+            message="Be the first student to list textbook or lab gear on your campus!"
+            actionLabel="List an Item"
             onAction={() => navigate('/sell')}
           />
         ) : (

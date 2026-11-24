@@ -9,7 +9,7 @@ export function PrivacyPage() {
           Privacy Policy
         </h1>
         <p style={{ color: 'var(--color-muted)', fontSize: 'var(--font-size-sm)' }}>
-          Last updated: October 2026 • BookLoop Campus Textbook Marketplace
+          Last updated: October 2026 • CampusGear Exchange Platform
         </p>
       </header>
 
@@ -19,7 +19,7 @@ export function PrivacyPage() {
             1. Principles & Data Minimization
           </h2>
           <p style={{ color: 'var(--color-text)', fontSize: 'var(--font-size-sm)' }}>
-            BookLoop is a student-first, peer-to-peer textbook marketplace built exclusively for campus communities. We adhere strictly to data minimization principles: we only collect the bare minimum information necessary to facilitate safe in-person textbook exchanges.
+            CampusGear Exchange is a student-first, peer-to-peer textbook &amp; lab-gear exchange built exclusively for campus communities. We adhere strictly to data minimization principles: we only collect the bare minimum information necessary to facilitate safe in-person exchanges.
           </p>
         </section>
 

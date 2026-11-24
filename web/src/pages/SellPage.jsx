@@ -15,6 +15,7 @@ import { Button } from '../components/ui/Button';
 import { ErrorState } from '../components/ui/ErrorState';
 import { Spinner } from '../components/ui/Spinner';
 import { Toast } from '../components/ui/Toast';
+import { BRANCH_OPTIONS, SEMESTER_OPTIONS, PICKUP_POINTS, EXCHANGE_TYPES } from '../lib/demoData';
 
 export function SellPage({ isEdit = false }) {
   const navigate = useNavigate();
@@ -25,10 +26,15 @@ export function SellPage({ isEdit = false }) {
   const [loadingInitial, setLoadingInitial] = useState(isEdit);
 
   // Form Fields
+  const [itemType, setItemType] = useState('book');
+  const [exchangeType, setExchangeType] = useState('Sell / Lend / Give Away');
   const [title, setTitle] = useState('');
   const [author, setAuthor] = useState('');
   const [edition, setEdition] = useState('');
   const [categoryId, setCategoryId] = useState('');
+  const [branch, setBranch] = useState('CSIT');
+  const [semester, setSemester] = useState('1');
+  const [pickupPoint, setPickupPoint] = useState('AITR Central Library');
   const [courseOrExam, setCourseOrExam] = useState('');
   const [condition, setCondition] = useState('good');
   const [priceRupees, setPriceRupees] = useState('');
@@ -97,10 +103,15 @@ export function SellPage({ isEdit = false }) {
           throw new Error('Cannot edit a listing that is already sold or removed.');
         }
 
+        setItemType(listing.item_type || 'book');
+        setExchangeType(listing.exchange_type || 'Sell / Lend / Give Away');
         setTitle(listing.title || '');
         setAuthor(listing.author || '');
         setEdition(listing.edition || '');
         setCategoryId(listing.category_id || '');
+        setBranch(listing.branch || 'CSIT');
+        setSemester(String(listing.semester || '1'));
+        setPickupPoint(listing.pickup_point || 'AITR Central Library');
         setCourseOrExam(listing.course_or_exam || '');
         setCondition(listing.condition || 'good');
         setPriceRupees(String(paiseToRupees(listing.price_paise)));
@@ -240,10 +251,15 @@ export function SellPage({ isEdit = false }) {
         // Call update_listing RPC
         const { error: rpcErr } = await supabase.rpc('update_listing', {
           p_listing_id: editId,
+          p_item_type: itemType,
+          p_exchange_type: exchangeType,
           p_title: title.trim(),
           p_author: author.trim() || null,
           p_edition: edition.trim() || null,
           p_category_id: categoryId,
+          p_branch: branch,
+          p_semester: Number(semester) || 1,
+          p_pickup_point: pickupPoint,
           p_course_or_exam: courseOrExam.trim() || null,
           p_condition: condition,
           p_description: description.trim() || null,
@@ -256,10 +272,15 @@ export function SellPage({ isEdit = false }) {
       } else {
         // Call create_listing RPC
         const { data: newListingId, error: rpcErr } = await supabase.rpc('create_listing', {
+          p_item_type: itemType,
+          p_exchange_type: exchangeType,
           p_title: title.trim(),
           p_author: author.trim() || null,
           p_edition: edition.trim() || null,
           p_category_id: categoryId,
+          p_branch: branch,
+          p_semester: Number(semester) || 1,
+          p_pickup_point: pickupPoint,
           p_course_or_exam: courseOrExam.trim() || null,
           p_condition: condition,
           p_description: description.trim() || null,
@@ -303,10 +324,10 @@ export function SellPage({ isEdit = false }) {
       </div>
 
       <h1 style={{ fontSize: 'var(--font-size-2xl)', color: 'var(--color-navy)', marginBottom: 'var(--space-2)' }}>
-        {isEdit ? 'Edit Book Listing' : 'Sell a Textbook'}
+        {isEdit ? 'Edit Listing' : 'List Textbook or Lab Gear for Exchange'}
       </h1>
       <p style={{ color: 'var(--color-muted)', fontSize: 'var(--font-size-sm)', marginBottom: 'var(--space-6)' }}>
-        List your course book for sale directly to verified peers on your campus.
+        List your textbook or laboratory equipment for direct campus handover at AITR.
       </p>
 
       <Card>
@@ -319,9 +340,44 @@ export function SellPage({ isEdit = false }) {
         )}
 
         <form onSubmit={handleSubmit} style={{ display: 'flex', flexDirection: 'column' }}>
+          {/* Item Type Selector */}
           <Field
-            label="Book Title"
-            placeholder="e.g. Operating System Concepts"
+            label="Exchange Item Type"
+            as="select"
+            value={itemType}
+            onChange={(e) => {
+              const val = e.target.value;
+              setItemType(val);
+              if (val === 'lab_gear') {
+                const labCat = categories.find((c) => c.name.toLowerCase().includes('lab'));
+                if (labCat) setCategoryId(labCat.id);
+              }
+            }}
+            required
+            hint="Choose whether you are listing a course textbook or lab gear/tools."
+          >
+            <option value="book">📖 Textbook / Course Book</option>
+            <option value="lab_gear">⚙️ Lab Gear (Drafter, Lab Coat, Calculator, Tool Kit)</option>
+          </Field>
+
+          {/* Exchange Type */}
+          <Field
+            label="Exchange Type"
+            as="select"
+            value={exchangeType}
+            onChange={(e) => setExchangeType(e.target.value)}
+            hint="Offer to sell, lend for the semester, or give away to a junior peer."
+          >
+            {EXCHANGE_TYPES.map((t) => (
+              <option key={t} value={t}>
+                {t}
+              </option>
+            ))}
+          </Field>
+
+          <Field
+            label={itemType === 'lab_gear' ? 'Item / Gear Title' : 'Book Title'}
+            placeholder={itemType === 'lab_gear' ? 'e.g. Engineering Drafter Set' : 'e.g. Operating System Concepts'}
             value={title}
             onChange={(e) => setTitle(e.target.value)}
             required
@@ -329,15 +385,15 @@ export function SellPage({ isEdit = false }) {
 
           <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))', gap: 'var(--space-3)' }}>
             <Field
-              label="Author(s)"
-              placeholder="e.g. Silberschatz, Galvin"
+              label={itemType === 'lab_gear' ? 'Brand / Manufacturer' : 'Author(s)'}
+              placeholder={itemType === 'lab_gear' ? 'e.g. Omega, Casio, Apsara' : 'e.g. Silberschatz, Galvin'}
               value={author}
               onChange={(e) => setAuthor(e.target.value)}
             />
 
             <Field
-              label="Edition / Year"
-              placeholder="e.g. 10th Edition"
+              label={itemType === 'lab_gear' ? 'Kit Type / Model' : 'Edition / Year'}
+              placeholder={itemType === 'lab_gear' ? 'e.g. Standard Size / fx-991ES' : 'e.g. 10th Edition'}
               value={edition}
               onChange={(e) => setEdition(e.target.value)}
             />
@@ -354,6 +410,53 @@ export function SellPage({ isEdit = false }) {
             {categories.map((c) => (
               <option key={c.id} value={c.id}>
                 {c.name}
+              </option>
+            ))}
+          </Field>
+
+          {/* Branch and Semester Filter fields */}
+          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))', gap: 'var(--space-3)' }}>
+            <Field
+              label="Engineering Branch"
+              as="select"
+              value={branch}
+              onChange={(e) => setBranch(e.target.value)}
+              required
+            >
+              {BRANCH_OPTIONS.map((b) => (
+                <option key={b} value={b}>
+                  {b}
+                </option>
+              ))}
+            </Field>
+
+            <Field
+              label="Semester"
+              as="select"
+              value={semester}
+              onChange={(e) => setSemester(e.target.value)}
+              required
+            >
+              {SEMESTER_OPTIONS.map((s) => (
+                <option key={s} value={s}>
+                  Semester {s}
+                </option>
+              ))}
+            </Field>
+          </div>
+
+          {/* Campus Handover Pickup Point */}
+          <Field
+            label="Campus Pickup Point (Handover Zone)"
+            as="select"
+            value={pickupPoint}
+            onChange={(e) => setPickupPoint(e.target.value)}
+            required
+            hint="Select the designated campus meet point for coordinate exchange."
+          >
+            {PICKUP_POINTS.map((pt) => (
+              <option key={pt} value={pt}>
+                📍 {pt}
               </option>
             ))}
           </Field>

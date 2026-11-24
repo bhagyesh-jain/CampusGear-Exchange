@@ -9,7 +9,7 @@ export function TermsPage() {
           Terms of Service & Marketplace Rules
         </h1>
         <p style={{ color: 'var(--color-muted)', fontSize: 'var(--font-size-sm)' }}>
-          Last updated: October 2026 • BookLoop Campus Textbook Marketplace
+          Last updated: October 2026 • CampusGear Exchange Platform
         </p>
       </header>
 
@@ -19,7 +19,7 @@ export function TermsPage() {
             1. Purpose & Student Agreement
           </h2>
           <p style={{ color: 'var(--color-text)', fontSize: 'var(--font-size-sm)' }}>
-            BookLoop is an online discovery platform connecting university and college students to facilitate physical, in-person exchanges of second-hand course textbooks. By registering an account or listing a book, you agree to abide by these Terms of Service.
+            CampusGear Exchange is an online discovery platform connecting university and college students to facilitate physical, in-person exchanges of course textbooks and lab gear. By registering an account or listing an item, you agree to abide by these Terms of Service.
           </p>
         </section>
 
@@ -28,7 +28,7 @@ export function TermsPage() {
             ⚠️ 2. Prohibited Items: Counterfeit & Pirated Material
           </h2>
           <p style={{ color: 'var(--color-text)', fontSize: 'var(--font-size-sm)', marginBottom: 'var(--space-2)' }}>
-            BookLoop strictly prohibits the listing, promotion, or sale of any unauthorized intellectual property. Specifically, you may NOT list:
+            CampusGear Exchange strictly prohibits the listing, promotion, or sale of any unauthorized intellectual property. Specifically, you may NOT list:
           </p>
           <ul style={{ paddingLeft: 'var(--space-5)', color: 'var(--color-text)', fontSize: 'var(--font-size-sm)', display: 'flex', flexDirection: 'column', gap: 'var(--space-2)' }}>
             <li>
@@ -63,7 +63,7 @@ export function TermsPage() {
             4. In-Person Transactions & Fair Exchange
           </h2>
           <p style={{ color: 'var(--color-text)', fontSize: 'var(--font-size-sm)' }}>
-            BookLoop does not process payments or collect commission fees. All financial settlements occur directly between buyer and seller during in-person campus handoffs. Buyers have the right and responsibility to inspect the physical book prior to paying. Once the exchange is completed, transactions are final.
+            CampusGear Exchange does not process payments or collect commission fees. All financial settlements occur directly between buyer and seller during in-person campus handoffs. Buyers have the right and responsibility to inspect the physical book prior to paying. Once the exchange is completed, transactions are final.
           </p>
         </section>
 
